@@ -332,7 +332,7 @@ gulp.task('watch', function() {
 
 gulp.task('deploy', function() {
   return gulp.src(['./dist/**/*'], {dot: true})
-        .pipe(deploy({branch: 'build', remoteUrl:'https://github.com/directus/directus'}));
+        .pipe(deploy({branch: 'build-6.3', remoteUrl:'https://github.com/directus/directus'}));
 });
 
 gulp.task('jscs', function() {
