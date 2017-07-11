@@ -111,9 +111,9 @@
 	{{/options}}
 	{{#if allowOther}}
 		<li class="other">
-			<input type="radio" name="{{name}}" value="" id="radio-{{name}}-custom" {{#if selected}}checked{{/if}} {{#if readOnly}}readonly{{/if}}>
+			<input type="radio" name="{{name}}" value="" id="radio-{{name}}-custom" {{#if customOption.selected}}checked{{/if}} {{#if readOnly}}readonly{{/if}}>
 			<label class="radiobuttons" for="radio-{{name}}-custom"></label>
-			<input type="text" placeholder="Other.." id="radio-{{name}}-custom-value"/>
+			<input type="text" placeholder="Other.." id="radio-{{name}}-custom-value" value="{{customOption.value}}"/>
 		</li>
 	{{/if}}
 	</ul>
