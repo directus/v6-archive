@@ -27,6 +27,13 @@ define(['./interface', 'core/UIComponent', 'core/t', 'utils'], function (Input, 
         }
       },
       {
+        id: 'allow_other',
+        ui: 'toggle',
+        type: 'Boolean',
+        comment: 'Allow the user to enter a custom value',
+        default_value: false
+      },
+      {
         id: 'list_view_formatting',
         ui: 'radio_buttons',
         type: 'String',

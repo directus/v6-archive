@@ -40,6 +40,7 @@ define([
         name: this.options.name,
         comment: this.options.schema.get('comment'),
         readOnly: this.options.settings.get('read_only') || !this.options.canWrite,
+        allowOther: this.options.settings.get('allow_other'),
         value: value
       };
     }
