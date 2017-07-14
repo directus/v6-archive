@@ -39,7 +39,7 @@ define(['app', 'core/UIComponent', 'core/UIView', 'core/t', 'core/uis/jsoneditor
         json = that.options.value;
       }
 
-      var value = that.options.value !== null ? json : [{"key": "value"}];
+      var value = that.options.value ? json : [{"key": "value"}];
       var jsonEditorName = "jsoneditor_" + that.options.name;
 
       var hiddenField = document.getElementById(jsonEditorName + '_value');
