@@ -61,7 +61,7 @@ class RelationalTableGatewayWithConditions extends RelationalTableGateway
             }
             $relatedTable = $column['relationship']['related_table'];
             $visibleColumn = $column['options']['visible_column'];
-            $keyLeft = $params['table_name'] . '.' . $params['orderBy'];
+            $keyLeft = $tableName . '.' . $params['orderBy'];
             // @todo it's wrong to assume PKs are "id" but this is currently endemic to directus6
             $keyRight = $relatedTable . '.id';
             $joinedSortColumn = $relatedTable . '.' . $visibleColumn;
