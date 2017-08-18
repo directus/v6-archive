@@ -1400,9 +1400,19 @@ $app->map("/$v/bookmarks(/:id)/?", function ($id = null) use ($params, $app, $Ze
             }
             return;
     }
-    $jsonResponse = $bookmarks->fetchByUserAndId($currentUser['id'], $id);
+    $response = $bookmarks->fetchByUserAndId($currentUser['id'], $id);
 
-    return $app->response($jsonResponse, ['table' => 'directus_bookmarks']);
+    if (!$response) {
+        $response = [
+            'message' => __t('unable_to_find_record_in_x_with_id_x', [
+                'table' => $bookmarks->getTable(),
+                'id' => $id
+            ]),
+            'success' => false
+        ];
+    }
+
+    return $app->response($response, ['table' => 'directus_bookmarks']);
 })->via('GET', 'POST', 'PUT', 'DELETE');
 
 /**

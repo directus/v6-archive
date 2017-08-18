@@ -146,8 +146,13 @@ class Application extends Slim
         if ($apiVersion > 1) {
             $meta = ArrayUtils::get($data, 'meta');
         } else {
+            $type = 'item';
+            if (is_array($data) && array_key_exists('rows', $data)) {
+                $type = 'collection';
+            }
+
             $meta = [
-                'type' => array_key_exists('rows', $data) ? 'collection' : 'item',
+                'type' => $type,
                 'table' => ArrayUtils::get($options, 'table')
             ];
         }

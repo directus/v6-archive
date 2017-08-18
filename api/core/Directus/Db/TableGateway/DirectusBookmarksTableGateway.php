@@ -78,15 +78,18 @@ class DirectusBookmarksTableGateway extends AclAwareTableGateway
     public function fetchByUserAndId($user_id, $id)
     {
         $select = new Select($this->table);
-        $select->limit(1);
-        $select
-            ->where
-            ->equalTo('id', $id)
-            ->equalTo('user', $user_id);
+        $select->where->equalTo('user', $user_id);
 
-        $bookmarks = $this
-            ->selectWith($select)
-            ->current();
+        if ($id !== null) {
+            $select->limit(1);
+            $select->where->equalTo('id', $id);
+        }
+
+        $bookmarks = $this->selectWith($select);
+
+        if ($id !== null) {
+            $bookmarks = $bookmarks->current();
+        }
 
         if ($bookmarks) {
             $bookmarks = $bookmarks->toArray();
