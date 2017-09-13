@@ -53,26 +53,32 @@ class Entries extends Route
         $TableGateway = new TableGateway($table, $ZendDb, $acl);
         $primaryKeyFieldName = $TableGateway->primaryKeyFieldName;
 
-        $rowIds = [];
-        foreach ($rows as $row) {
-            if (!array_key_exists($primaryKeyFieldName, $row)) {
-                throw new \Exception(__t('row_without_primary_key_field'));
-            }
-            array_push($rowIds, $row[$primaryKeyFieldName]);
-        }
-
-        $where = new \Zend\Db\Sql\Where;
-
         if ($this->app->request()->isDelete()) {
-            $TableGateway->delete($where->in($primaryKeyFieldName, $rowIds));
+            $rowIds = [];
+
+            foreach ($rows as $row) {
+                if (!array_key_exists($primaryKeyFieldName, $row)) {
+                    throw new \Exception(__t('row_without_primary_key_field'));
+                }
+
+                array_push($rowIds, $row[$primaryKeyFieldName]);
+            }
+
+            $where = new \Zend\Db\Sql\Where();
+            $deleted = $TableGateway->delete($where->in($primaryKeyFieldName, $rowIds));
+            $response = [
+                'meta' => ['table' => $TableGateway->getTable(), 'ids' => $rowIds],
+                'data' => ['success' => !! $deleted]
+            ];
         } else {
             foreach ($rows as $row) {
                 $TableGateway->updateCollection($row);
             }
+
+            $response = $TableGateway->getEntries($params);
         }
 
-        $entries = $TableGateway->getEntries($params);
-        return $this->app->response($entries);
+        return $this->app->response($response);
     }
 
     public function typeAhead($table, $query = null)
