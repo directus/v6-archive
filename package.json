@@ -33,7 +33,8 @@
       "import/no-extraneous-dependencies": 0,
       "import/no-unresolved": 0,
       "func-name-matching": "warn",
-      "no-warning-comments": "warn"
+      "no-warning-comments": "warn",
+      "import/no-unassigned-import": "warn"
     }
   },
   "private": true,
