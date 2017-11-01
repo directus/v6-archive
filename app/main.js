@@ -1,11 +1,3 @@
-
-//  main.js
-//  Directus 6.0
-
-//  (c) RANGER
-//  Directus may be freely distributed under the GNU license.
-//  For all details and documentation:
-//  http://www.getdirectus.com
 require(['config', 'polyfills'], function () {
   require([
     'app',
@@ -32,7 +24,6 @@ require(['config', 'polyfills'], function () {
     'contextual-date',
     'core/notification'
   ], function (app, _, UIManager, Router, Backbone, alerts, __t, Tabs, Bookmarks, Messages, SchemaManager, SettingsCollection, EntriesModel, Extension, CustomUIView, ExtensionManager, EntriesManager, ListViewManager, StatusTableCollection, Idle, moment, ContextualDate, Notification) {
-
     'use strict';
 
     var defaultOptions = {
@@ -58,7 +49,7 @@ require(['config', 'polyfills'], function () {
       user_notifications: [],
       showWelcomeWindow: false,
       // TODO: Change this to a model (alias to a new account/user object)
-      me: { id: null },
+      me: {id: null},
       settings: {
         global: {},
         files: {}
@@ -89,22 +80,22 @@ require(['config', 'polyfills'], function () {
 
     $.xhrPool = []; // array of uncompleted requests
     $.xhrPool.abortAll = function () { // our abort function
-        $(this).each(function (idx, jqXHR) {
-            jqXHR.abort();
-        });
-        $.xhrPool.length = 0;
+      $(this).each(function (idx, jqXHR) {
+        jqXHR.abort();
+      });
+      $.xhrPool.length = 0;
     };
 
     $.ajaxSetup({
-        beforeSend: function (jqXHR) { // before jQuery send the request we will push it to our array
-            $.xhrPool.push(jqXHR);
-        },
-        complete: function (jqXHR) { // when some of the requests completed it will splice from the array
-            var index = $.xhrPool.indexOf(jqXHR);
-            if (index > -1) {
-                $.xhrPool.splice(index, 1);
-            }
+      beforeSend: function (jqXHR) { // before jQuery send the request we will push it to our array
+        $.xhrPool.push(jqXHR);
+      },
+      complete: function (jqXHR) { // when some of the requests completed it will splice from the array
+        var index = $.xhrPool.indexOf(jqXHR);
+        if (index > -1) {
+          $.xhrPool.splice(index, 1);
         }
+      }
     });
 
     moment.locale(options.locale);
@@ -123,7 +114,6 @@ require(['config', 'polyfills'], function () {
       ListViewManager.load(options.listViews)
 
     ).done(function () {
-
       app.trigger('loaded');
 
       // Register UI schemas
@@ -157,16 +147,16 @@ require(['config', 'polyfills'], function () {
 
       EntriesManager.setup({
         apiURL: app.API_URL,
-        rowsPerPage: parseInt(options.config['rows_per_page'], 10)
+        rowsPerPage: parseInt(options.config.rows_per_page, 10)
       });
 
-      ////////////////////////////////////////////////////////////////////////////////////
+      // /////////////////////////////////////////////////////////////////////////////////
       // Setup global instances
 
-      app.users    = EntriesManager.getInstance('directus_users');
-      app.files    = EntriesManager.getInstance('directus_files');
+      app.users = EntriesManager.getInstance('directus_users');
+      app.files = EntriesManager.getInstance('directus_files');
       app.activity = EntriesManager.getInstance('directus_activity');
-      app.groups   = EntriesManager.getInstance('directus_groups');
+      app.groups = EntriesManager.getInstance('directus_groups');
 
       // This needs elegance
       app.settings = new SettingsCollection(options.settings, {parse: true});
@@ -214,13 +204,13 @@ require(['config', 'polyfills'], function () {
 
       var autoLogoutMinutes = parseInt(app.settings.get('cms_user_auto_sign_out') || 60, 10);
 
-      var waitForForActivity = function() {
+      var waitForForActivity = function () {
         // console.log('minutes until automatic logout:', autoLogoutMinutes);
         Idle.start({
           timeout: function () {
             Notification.warning(null, 'You\'ve been inactive for ' + autoLogoutMinutes + ' minutes. You will be automatically logged out in 10 seconds');
 
-            //Wait for another 10 seconds before kicking the user out
+            // Wait for another 10 seconds before kicking the user out
             Idle.start({
               timeout: function () {
                 app.logOut(true, true);
@@ -229,17 +219,15 @@ require(['config', 'polyfills'], function () {
               delay: 10000,
               repeat: false
             });
-
           },
           delay: autoLogoutMinutes * 60 * 1000,
           repeat: true
         });
-
       };
 
       waitForForActivity();
 
-      ////////////////////////////////////////////////////////////////////////////////////
+      // //////////////////////////////////////////////////////////////////////////////////
       // Bind Progress Functions To App
 
       app.showProgressNotification = function (message) {
@@ -250,7 +238,7 @@ require(['config', 'polyfills'], function () {
         alerts.hideProgressNotification();
       };
 
-      ////////////////////////////////////////////////////////////////////////////////////
+      // //////////////////////////////////////////////////////////////////////////////////
       // Setup Tabs @TODO: REMOVE
       // Default directus tabs
 
@@ -263,9 +251,9 @@ require(['config', 'polyfills'], function () {
         tabs.unshift();
       }
 
-      ////////////////////////////////////////////////////////////////////////////////////
+      // //////////////////////////////////////////////////////////////////////////////////
       // Setup Bookmarks
-      ////////////////////////////////////////////////////////////////////////////////////
+      // //////////////////////////////////////////////////////////////////////////////////
       var bookmarks = [];
 
       options.tables.forEach(function (table) {
@@ -344,17 +332,17 @@ require(['config', 'polyfills'], function () {
         isCustomBookmarks: isCustomBookmarks
       });
 
-      //////////////////////////////////////////////////////////////////////////////
-      //Override backbone sync for custom error handling
+      // ////////////////////////////////////////////////////////////////////////////
+      // Override backbone sync for custom error handling
       var sync = Backbone.sync;
       Backbone.sync = function (method, model, options) {
-        var existingErrorHandler = function(){};
+        var existingErrorHandler = function () {};
         if (undefined !== options.error) {
           existingErrorHandler = options.error;
         }
 
         var errorCodeHandler = function (xhr, status, thrown) {
-          //@todo: note that status is getting overwritten. don't!
+          // @todo: note that status is getting overwritten. don't!
           status = xhr.status;
 
           existingErrorHandler(xhr, status, thrown);
@@ -419,7 +407,6 @@ require(['config', 'polyfills'], function () {
 
       // Capture sync errors...
       $(document).ajaxError(function (event, xhr, settings) {
-
         logOutIfPublicRequest(xhr);
 
         if (settings.errorPropagation === false) {
@@ -437,7 +424,7 @@ require(['config', 'polyfills'], function () {
           return;
         }
 
-        isJSON = !!xhr.responseJSON;
+        isJSON = Boolean(xhr.responseJSON);
         messageBody = isJSON ? xhr.responseJSON : xhr.responseText;
         error = {
           message: __t('unknown')
@@ -482,7 +469,7 @@ require(['config', 'polyfills'], function () {
             break;
         }
 
-        app.trigger('alert:error', messageTitle, error.message, details)
+        app.trigger('alert:error', messageTitle, error.message, details);
       });
 
       // And js errors...
@@ -500,7 +487,7 @@ require(['config', 'polyfills'], function () {
 
       // Trigger the initial route and enable HTML5 History API support, set the
       // root folder to '/' by default.  Change in app.js.
-      Backbone.history.start({ pushState: true, root: app.root });
+      Backbone.history.start({pushState: true, root: app.root});
 
       // All navigation that is relative should be passed through the navigate
       // method, to be processed by the router. If the link has a `data-bypass`
@@ -513,7 +500,7 @@ require(['config', 'polyfills'], function () {
           target: $(this).attr('target')
         };
         // Get the absolute root.
-        var root = location.protocol + "//" + location.host + app.root;
+        var root = location.protocol + '//' + location.host + app.root;
 
         // Ensure the root is part of the anchor href, meaning it's relative.
         // @NOTE: We don't need to strictly check for "_blank".
@@ -525,7 +512,9 @@ require(['config', 'polyfills'], function () {
           event.preventDefault();
 
           // Don't follow empty links
-          if (href.attr === '#') return;
+          if (href.attr === '#') {
+            return;
+          }
 
           // Remove the directus sub-path from the anchor href
           // Backbone.history already have app.root as root.
@@ -539,7 +528,7 @@ require(['config', 'polyfills'], function () {
           // calls this anyways.  The fragment is sliced from the root.
           Backbone.history.navigate(path, true);
         }
-      }).on('scroll', function(){
+      }).on('scroll', function () {
         // Fade in header shadow based on scroll position
         var windowScroll = Math.max(Math.min($(window).scrollTop(), 100), 0) / 100;
         $('#header-shadow').css({opacity: windowScroll});

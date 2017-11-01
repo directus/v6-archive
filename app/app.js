@@ -1,30 +1,28 @@
 define(function (require, exports, module) {
-
   'use strict';
 
-  // Load dependent Modules
-  var Handlebars     = require('handlebars'),
-      Backbone       = require('backbone'),
-      config         = new Backbone.Model(require('core/config')),
-      moment         = require('moment'),
-      Utils          = require('utils'),
-      _              = require('underscore'),
-      __t            = require('core/t'),
-      Notification   = require('core/notification'),
-      typetools      = require('typetools');
+  var Handlebars = require('handlebars');
+  var Backbone = require('backbone');
+  var moment = require('moment');
+  var Utils = require('utils');
+  var _ = require('underscore');
+  var __t = require('core/t');
+  var Notification = require('core/notification');
+  var typetools = require('typetools');
+  var config = new Backbone.Model(require('core/config'));
 
-  // Globally load Handlebars helpers
-  require('helpers');
+  // Initialize Handlebars helpers functions
+  require('./helpers');
 
-  // Load layout manager so it can be configured
+  require('plugins/bootstrap-dropdown');
+  require('plugins/typeahead');
+
+  // Foundation for assembling layouts and views
   require('plugins/backbone.layoutmanager');
 
-  // Load Backbone Model Track it plugin
-  // Track Model changes
   require('plugins/backbone.trackit');
 
-  // Load Backbone Model Stick it plugin
-  // Sync changes between views and model
+  // Syncs data between model and view
   require('plugins/backbone.stickit');
 
   // hotfix: add isTracking function to all models
@@ -35,14 +33,10 @@ define(function (require, exports, module) {
     }
   });
 
-  // Globally load Bootstrap plugins
-  require('plugins/bootstrap-dropdown');
-  require('plugins/typeahead');
-
+  // Locked state of the app
   var locked = false;
 
   var app = {
-
     config: config,
 
     progressView: undefined,
@@ -98,7 +92,7 @@ define(function (require, exports, module) {
     fetchMessages: function () {
       var self = this;
       var data = {
-        'max_id': this.messages.maxId
+        max_id: this.messages.maxId
       };
 
       var onSuccess = function (collection, response) {
@@ -151,7 +145,6 @@ define(function (require, exports, module) {
         success: onSuccess,
         error: onError
       });
-
     },
 
     request: function (type, url, options) {
@@ -197,7 +190,7 @@ define(function (require, exports, module) {
     },
 
     //  TODO: implement this into a new logger
-    //logErrorToServer: function(type, message, details) {
+    // logErrorToServer: function(type, message, details) {
     //  var user = app.user, email = 'n/a';
     //
     //  if (user) {
@@ -219,7 +212,7 @@ define(function (require, exports, module) {
     //    .error(function(obj) {
     //      console.log('FAILED TO LOG ERROR'+obj.responseText);
     //    });
-    //},
+    // },
 
     checkUserEditingConflict: function () {
       var users = app.users.clone();
@@ -272,7 +265,7 @@ define(function (require, exports, module) {
 
           Notification.warning(__t(localeKey, {
             full_names: fullNames
-          }))
+          }));
         }
       };
 
@@ -304,18 +297,18 @@ define(function (require, exports, module) {
     affix: function () {
       var sidebarOffset = $('#sidebar').offset();
       var navbarHeight = $('.navbar').height();
-      var stickyHeight = parseInt(sidebarOffset.top,10) - parseInt(navbarHeight,10) - 20;
+      var stickyHeight = parseInt(sidebarOffset.top, 10) - parseInt(navbarHeight, 10) - 20;
       var stuck = false;
-      $(window).scroll(function(e){
+      $(window).scroll(function (e) {
         var scrollTop = $(window).scrollTop();
-        if(!stuck && scrollTop >= stickyHeight){
-          //console.log("stuck");
+        if (!stuck && scrollTop >= stickyHeight) {
+          // console.log("stuck");
           stuck = true;
-          $("#sidebar").addClass('affix-sidebar');
-        } else if(stuck && scrollTop < stickyHeight){
-          //console.log("unstuck");
+          $('#sidebar').addClass('affix-sidebar');
+        } else if (stuck && scrollTop < stickyHeight) {
+          // console.log("unstuck");
           stuck = false;
-          $("#sidebar").removeClass('affix-sidebar');
+          $('#sidebar').removeClass('affix-sidebar');
         }
       });
     }
@@ -325,16 +318,18 @@ define(function (require, exports, module) {
   app.sendFiles = function (files, callback, progressCallback) {
     var formData = new FormData();
 
-    var success = function(responseData) {
+    var success = function (responseData) {
       callback.apply(this, [responseData]);
     };
 
-    if (files instanceof File) files = [files];
-    _.each(files, function(file, i) {
-      formData.append('file'+i, file);
+    if (files instanceof File) {
+      files = [files];
+    }
+    _.each(files, function (file, i) {
+      formData.append('file' + i, file);
     });
 
-    //app.trigger('progress', 'Uploading');
+    // app.trigger('progress', 'Uploading');
 
     $.ajax({
       url: app.API_URL + 'upload',
@@ -345,13 +340,13 @@ define(function (require, exports, module) {
       processData: false,
       success: success,
       error: function () {
-        app.trigger('alert','upload failed', arguments);
+        app.trigger('alert', 'upload failed', arguments);
         callback.apply(this, []);
       },
       xhr: function () {  // custom xhr
         var myXhr = $.ajaxSettings.xhr();
-        if(myXhr.upload && progressCallback){ // check if upload property exists
-          myXhr.upload.addEventListener('progress',progressCallback, false); // for handling the progress of the upload
+        if (myXhr.upload && progressCallback) { // check if upload property exists
+          myXhr.upload.addEventListener('progress', progressCallback, false); // for handling the progress of the upload
         }
         return myXhr;
       }
@@ -367,18 +362,18 @@ define(function (require, exports, module) {
       url: app.API_URL + 'upload/link',
       type: 'POST',
       data: {
-        'link': link
+        link: link
       },
       success: success,
       error: function (err1, err2, err3) {
-        app.trigger('alert','upload failed', arguments);
+        app.trigger('alert', 'upload failed', arguments);
       }
     });
   };
 
   // check if string has this format "D, d M Y H:i:s"
   app.isStringADate = function (date) {
-    return (typeof date === 'string') ? !!date.match(/^([a-zA-Z]{3})\, ([0-9]{2}) ([a-zA-Z]{3}) ([0-9]{4}) ([0-9]{2}):([0-9]{2}):([0-9]{2})$/) : false;
+    return (typeof date === 'string') ? Boolean(date.match(/^([a-zA-Z]{3})\, ([0-9]{2}) ([a-zA-Z]{3}) ([0-9]{4}) ([0-9]{2}):([0-9]{2}):([0-9]{2})$/)) : false;
   };
 
   // Agnus Croll:
@@ -387,20 +382,19 @@ define(function (require, exports, module) {
     return ({}).toString.call(obj).match(/\s([a-z|A-Z]+)/)[1].toLowerCase();
   };
 
-
-  //Give forms the ability to serialize to objects
+  // Give forms the ability to serialize to objects
   $.fn.serializeObject = function () {
     var o = {};
     var a = this.serializeArray();
     $.each(a, function () {
-        if (o[this.name] !== undefined) {
-            if (!o[this.name].push) {
-                o[this.name] = [o[this.name]];
-            }
-            o[this.name].push(this.value || '');
-        } else {
-            o[this.name] = this.value || '';
+      if (o[this.name] !== undefined) {
+        if (!o[this.name].push) {
+          o[this.name] = [o[this.name]];
         }
+        o[this.name].push(this.value || '');
+      } else {
+        o[this.name] = this.value || '';
+      }
     });
 
     return o;
@@ -416,7 +410,6 @@ define(function (require, exports, module) {
 
     prefix: 'app/templates/',
 
-
     fetchTemplate: function (path) {
       // Concatenate the file extension.
 
@@ -425,7 +418,7 @@ define(function (require, exports, module) {
         return path;
       }
 
-      path = path + '.handlebars';
+      path += '.handlebars';
 
       // If cached, use the compiled template.
       if (JST[path]) {
@@ -438,9 +431,9 @@ define(function (require, exports, module) {
       // Seek out the template asynchronously.
       // ASYNC is causing render-order trouble, use sync now since it will be compiled anyway
 
-      //$.get(app.root + path, function(contents) {
+      // $.get(app.root + path, function(contents) {
       //  done(JST[path] = Handlebars.compile(contents));
-      //});
+      // });
 
       $.ajax({
         url: app.root + path,
@@ -452,7 +445,6 @@ define(function (require, exports, module) {
           done(JST[path] = Handlebars.compile(contents));
         }
       });
-
     }
   });
 
@@ -478,7 +470,7 @@ define(function (require, exports, module) {
   app = _.extend(app, {
     // Create a custom object with a nested Views object.
     module: function (additionalProps) {
-      return _.extend({ Views: {} }, additionalProps);
+      return _.extend({Views: {}}, additionalProps);
     },
 
     // Helper for using layouts.

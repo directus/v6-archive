@@ -7,64 +7,67 @@
 //  http://www.getdirectus.com
 
 define(function (require, exports, module) {
-
   'use strict';
 
-  var app              = require('app'),
-      directus         = require('directus'),
-      Backbone         = require('backbone'),
-      _                = require('underscore'),
-      Utils            = require('utils'),
-      Notification     = require('core/notification'),
-      WelcomeModal     = require('core/modals/welcome'),
-      //Directus       = require('core/directus'),
-      Tabs             = require('core/tabs'),
-      BaseHeaderView   = require('core/baseHeaderView'),
-      Bookmarks        = require('core/bookmarks'),
-      SchemaManager    = require('schema/SchemaManager'),
-      EntriesManager   = require('core/EntriesManager'),
-      ExtensionManager = require('core/ExtensionManager'),
-      PreferenceModel  = require('core/PreferenceModel'),
-      Activity         = require('modules/activity/activity'),
-      Table            = require('modules/tables/table'),
-      Settings         = require('modules/settings/settings'),
-      Files            = require('modules/files/files'),
-      Users            = require('modules/users/users'),
-      Messages         = require('modules/messages/messages'),
-      __t              = require('core/t'),
-      moment           = require('moment');
+  var Backbone = require('backbone');
+  var _ = require('underscore');
+
+  var app = require('app');
+  var directus = require('./directus');
+  var Notification = require('core/notification');
+  var WelcomeModal = require('core/modals/welcome');
+  var Tabs = require('core/tabs');
+  var BaseHeaderView = require('core/baseHeaderView');
+  var Bookmarks = require('core/bookmarks');
+  var SchemaManager = require('schema/SchemaManager');
+  var EntriesManager = require('core/EntriesManager');
+  var ExtensionManager = require('core/ExtensionManager');
+  var __t = require('core/t');
+  var PreferenceModel = require('core/PreferenceModel');
+  var Activity = require('modules/activity/activity');
+  var Table = require('modules/tables/table');
+  var Settings = require('modules/settings/settings');
+  var Files = require('modules/files/files');
+  var Users = require('modules/users/users');
+  var Messages = require('modules/messages/messages');
 
   var Router = Backbone.Router.extend({
     routes: {
-      '':                                            'tables',
-      'tables(/pref/:pref)':                         'tables',
-      'tables/:name(/pref/:pref)(/pref/:pref)':      'entries',
-      'tables/:name/:id(/pref/:pref)':               'entry',
-      'bookmark/:title':                             'bookmark',
-      'activity(/pref/:pref)':                       'activity',
-      'files(/pref/:pref)(/pref/:pref)':             'files',
-      'files/:id(/pref/:pref)':                      'filesItem',
-      'users(/pref/:pref)(/pref/:pref)':             'users',
-      'users/:id(/pref/:pref)':                      'user',
-      'settings(/pref/:pref)':                       'settings',
-      'settings/:name(/pref/:pref)':                 'settings',
-      'settings/tables/:table(/pref/:pref)':         'settingsTable',
-      'settings/permissions/:groupId(/pref/:pref)':  'settingsPermissions',
-      'messages(/pref/:pref)':                       'messages',
-      'messages/new(/pref/:pref)':                   'newMessage',
-      'messages/:id(/response/:respId)':             'message',
-      '*notFound':                                   'notFound'
+      '': 'tables',
+      'tables(/pref/:pref)': 'tables',
+      'tables/:name(/pref/:pref)(/pref/:pref)': 'entries',
+      'tables/:name/:id(/pref/:pref)': 'entry',
+      'bookmark/:title': 'bookmark',
+      'activity(/pref/:pref)': 'activity',
+      'files(/pref/:pref)(/pref/:pref)': 'files',
+      'files/:id(/pref/:pref)': 'filesItem',
+      'users(/pref/:pref)(/pref/:pref)': 'users',
+      'users/:id(/pref/:pref)': 'user',
+      'settings(/pref/:pref)': 'settings',
+      'settings/:name(/pref/:pref)': 'settings',
+      'settings/tables/:table(/pref/:pref)': 'settingsTable',
+      'settings/permissions/:groupId(/pref/:pref)': 'settingsPermissions',
+      'messages(/pref/:pref)': 'messages',
+      'messages/new(/pref/:pref)': 'newMessage',
+      'messages/:id(/response/:respId)': 'message',
+      '*notFound': 'notFound'
     },
 
     route: function (route, name, callback) {
       var router = this;
       var args = _.toArray(arguments);
-      if (!callback) callback = this[name];
+      if (!callback) {
+        callback = this[name];
+      }
 
       var cb = function () {
-        if (_.isFunction(this.before)) this.before.apply(router, args);
+        if (_.isFunction(this.before)) {
+          this.before.apply(router, args);
+        }
         callback.apply(router, arguments);
-        if (_.isFunction(this.after)) this.after.apply(router, args);
+        if (_.isFunction(this.after)) {
+          this.after.apply(router, args);
+        }
       };
       return Backbone.Router.prototype.route.call(this, route, name, cb);
     },
@@ -82,7 +85,7 @@ define(function (require, exports, module) {
     // @todo: refactoring
     before: function (route, name) {
       var fragment = Backbone.history.fragment;
-      if(fragment) {
+      if (fragment) {
         var routeHistoryBase = fragment;
         if (this.routeHistory.base === '' || routeHistoryBase.indexOf(this.routeHistory.base) !== 0) {
           this.routeHistory.base = routeHistoryBase;
@@ -96,40 +99,41 @@ define(function (require, exports, module) {
         var nextRoute = {route: name, path: fragment, args: this.getRouteParameters(route, fragment), subroutes: []};
 
         // Exists
-        if(currentRoute && nextRoute) {
+        if (currentRoute && nextRoute) {
           var current = currentRoute = this.routeHistory.routes[currentRoute.path];
           var next = this.routeHistory.routes[nextRoute.path];
 
-          if(next) {
+          if (next) {
             delete this.routeHistory.routes[currentRoute.path];
             currentRoute = undefined;
           }
         }
 
-        if(currentRoute) {
+        if (currentRoute) {
           currentRoute.scrollTop = parseInt(document.body.scrollTop, 10) || 0;
           currentRoute.toRoute = nextRoute;
         }
         this.routeHistory.stack.push(nextRoute);
         this.routeHistory.last = currentRoute ? currentRoute.path : fragment;
-        if(!this.routeHistory.routes[fragment]) {
+        if (!this.routeHistory.routes[fragment]) {
           this.routeHistory.routes[fragment] = nextRoute;
         }
       }
 
       var mainSidebar = document.getElementById('mainSidebar');
-      if(mainSidebar) {
+      if (mainSidebar) {
         this.scrollTop = parseInt(mainSidebar.scrollTop, 10) || 0;
       }
     },
 
     after: function (route, name) {
       var currentRoute = this.routeHistory.routes[this.routeHistory.last];
-      var itemID, scrollTop = 0;
-      if(currentRoute && currentRoute.path === Backbone.history.fragment) {
-        if(currentRoute.toRoute) {
+      var itemID,
+        scrollTop = 0;
+      if (currentRoute && currentRoute.path === Backbone.history.fragment) {
+        if (currentRoute.toRoute) {
           itemID = _.last(_.filter(currentRoute.toRoute.args, function (v) {
-            return v !== null
+            return v !== null;
           }));
         }
         scrollTop = currentRoute.scrollTop;
@@ -274,7 +278,7 @@ define(function (require, exports, module) {
 
       // TODO: move this into a global collection
       if (view.model && !view.model._trackingChanges) {
-          view.model.startTracking();
+        view.model.startTracking();
       } else if (view.collection) {
         // TODO: make startTracking part of Collection
         var cb = function (collection) {
@@ -309,11 +313,10 @@ define(function (require, exports, module) {
         if (hasUnsavedAttributes() || (that.baseRouteSave === this.getFragment() || window.confirm('All Unsaved changes will be lost, Are you sure you want to leave?'))) {
           Backbone.History.prototype.loadUrl = that.oldLoadUrlFunction;
           return that.oldLoadUrlFunction.apply(this, arguments);
-        } else {
-          this.navigate(that.baseRouteSave);
-          that.navigate(that.baseRouteSave);
-          return true;
         }
+        this.navigate(that.baseRouteSave);
+        that.navigate(that.baseRouteSave);
+        return true;
       };
     },
 
@@ -355,11 +358,15 @@ define(function (require, exports, module) {
       this.v.main.setView('#content', new View(options)).render();
     },
 
+    /**
+     * Main entry route (home '/') of the app
+     */
     tables: function () {
-      if (_.contains(this.navBlacklist,'tables'))
+      if (_.contains(this.navBlacklist, 'tables')) {
         return this.notFound();
+      }
 
-      this.navigate('/tables'); //If going to / rewrite to tables
+      this.navigate('/tables'); // If going to / rewrite to tables
       this.setTitle(app.settings.get('global').get('project_name') + ' | Tables');
       this.v.main.setView('#content', new Table.Views.Tables({collection: SchemaManager.getTables()}));
       this.v.main.render();
@@ -369,9 +376,9 @@ define(function (require, exports, module) {
       var privileges = SchemaManager.getPrivileges(tableName);
 
       if (
-        !SchemaManager.getTable(tableName)
-        || _.contains(this.navBlacklist, 'tables')
-        || !privileges || !privileges.can('view')
+        !SchemaManager.getTable(tableName) ||
+        _.contains(this.navBlacklist, 'tables') ||
+        !privileges || !privileges.can('view')
       ) {
         return this.notFound();
       }
@@ -388,12 +395,12 @@ define(function (require, exports, module) {
       }
 
       if (collection.table.get('single')) {
-        if(collection.models.length) {
+        if (collection.models.length) {
           this.entry(tableName, collection.models[0].get('id'));
         } else {
           // Fetch collection so we know the ID of the "single" row
-          collection.once('sync', _.bind(function (collection, xhr, status){
-            if(0 === collection.length) {
+          collection.once('sync', _.bind(function (collection, xhr, status) {
+            if (collection.length === 0) {
               // Add new form
               this.router.entry(tableName, 'new');
             } else {
@@ -401,13 +408,13 @@ define(function (require, exports, module) {
               var model = collection.models[0];
               this.router.entry(tableName, model.get('id'));
             }
-          }, {router:this}));
+          }, {router: this}));
           collection.fetch();
         }
         return;
       }
 
-      //Clear loaded preference if navigating to new entries
+      // Clear loaded preference if navigating to new entries
       if (this.loadedPreference) {
         this.loadedPreference = undefined;
       }
@@ -428,9 +435,9 @@ define(function (require, exports, module) {
       var privileges = SchemaManager.getPrivileges(tableName);
 
       if (
-        !SchemaManager.getTable(tableName)
-        || _.contains(this.navBlacklist, 'tables')
-        || !privileges || !privileges.can('view')
+        !SchemaManager.getTable(tableName) ||
+        _.contains(this.navBlacklist, 'tables') ||
+        !privileges || !privileges.can('view')
       ) {
         return this.notFound();
       }
@@ -438,10 +445,10 @@ define(function (require, exports, module) {
       this.setTitle(app.settings.get('global').get('project_name') + ' | Entry');
 
       var isBatchEdit = (typeof id === 'string') && id.indexOf(',') !== -1,
-          collection,
-          model,
-          options,
-          view;
+        collection,
+        model,
+        options,
+        view;
 
       // see if the collection is cached...
       if (this.currentCollection !== undefined && this.currentCollection.table.id === tableName) {
@@ -524,8 +531,9 @@ define(function (require, exports, module) {
     },
 
     activity: function () {
-      if (_.contains(this.navBlacklist,'activity'))
+      if (_.contains(this.navBlacklist, 'activity')) {
         return this.notFound();
+      }
 
       this.setTitle(app.settings.get('global').get('project_name') + ' | Activity');
       this.v.main.setView('#content', new Activity.Views.List({collection: app.activity}));
@@ -533,8 +541,9 @@ define(function (require, exports, module) {
     },
 
     files: function (pref) {
-      if (_.contains(this.navBlacklist,'files'))
+      if (_.contains(this.navBlacklist, 'files')) {
         return this.notFound();
+      }
 
       if (pref) {
         this.navigate('/files');
@@ -545,7 +554,7 @@ define(function (require, exports, module) {
 
         this.loadedPreference = pref;
       } else {
-        //If no LoadedPref unset
+        // If no LoadedPref unset
         if (this.loadedPreference && this.lastRoute.indexOf('files/pref/') === -1) {
           this.loadedPreference = null;
         }
@@ -585,18 +594,17 @@ define(function (require, exports, module) {
     },
 
     users: function (pref) {
-      if(pref) {
+      if (pref) {
         this.navigate('/users');
 
-        if(this.lastRoute === 'users/' && this.loadedPreference === pref) {
+        if (this.lastRoute === 'users/' && this.loadedPreference === pref) {
           return;
         }
 
         this.loadedPreference = pref;
       } else {
-        //If no LoadedPref unset
-        if(this.loadedPreference && this.lastRoute.indexOf('users/pref/') === -1)
-        {
+        // If no LoadedPref unset
+        if (this.loadedPreference && this.lastRoute.indexOf('users/pref/') === -1) {
           this.loadedPreference = null;
         }
       }
@@ -610,7 +618,7 @@ define(function (require, exports, module) {
       var user = app.user;
       var userGroup = user.get('group');
 
-      if (!(parseInt(id,10) === user.id || userGroup.id === 1)) {
+      if (!(parseInt(id, 10) === user.id || userGroup.id === 1)) {
         return this.notFound();
       }
 
@@ -619,7 +627,7 @@ define(function (require, exports, module) {
       this.setTitle(app.settings.get('global').get('project_name') + ' | Users');
 
       if (isNew) {
-        model = new app.users.model({}, {collection: app.users, parse:true});
+        model = new app.users.model({}, {collection: app.users, parse: true});
       } else {
         model = app.users.get(id, false);
 
@@ -656,9 +664,9 @@ define(function (require, exports, module) {
         return this.notFound();
       }
 
-      this.setTitle(app.settings.get('project_name') + ' | '+__t('settings'));
+      this.setTitle(app.settings.get('project_name') + ' | ' + __t('settings'));
 
-      switch(name) {
+      switch (name) {
         case 'tables':
           this.v.main.setView('#content', new Settings.Tables({collection: SchemaManager.getTables()}));
           break;
@@ -764,7 +772,7 @@ define(function (require, exports, module) {
       bookmarksView.setActive(currentPath);
 
       this.lastRoute = currentPath;
-      if ( this.loadedPreference ) {
+      if (this.loadedPreference) {
         this.lastRoute += '/' + this.loadedPreference;
       }
 
@@ -774,13 +782,13 @@ define(function (require, exports, module) {
       currentUser.updateLastRoute(route, history);
 
       // check for a pending alert to execute
-      if(!_.isEmpty(this.pendingAlert)) {
+      if (!_.isEmpty(this.pendingAlert)) {
         this.openModal({type: this.pendingAlert.type, text: this.pendingAlert.message});
         this.pendingAlert = {};
       }
     },
 
-    navigateToSubroute: function(type, callArguments, view) {
+    navigateToSubroute: function (type, callArguments, view) {
       var parentRoute = _.last(this.routeHistory.stack);
       var subroute = {
         type: type,
@@ -796,32 +804,31 @@ define(function (require, exports, module) {
       }, document.title, Backbone.history.root + Backbone.history.fragment);
     },
 
-    checkUrlForSubroute: function(e) {
+    checkUrlForSubroute: function (e) {
       var newSubrouteId = (e.state) ? e.state.subrouteId : null;
       var previousSubrouteId = this.routeHistory.subrouteId;
       var route = _.last(this.routeHistory.stack);
-      var subroutes = route['subroutes'];
+      var subroutes = route.subroutes;
 
       // if previous and new are equal, then we don't need to do anything - it was already done before
       // (and, probably, it was done better)
-      if((!_.isNumber(previousSubrouteId) && !_.isNumber(newSubrouteId)) ||
-        (previousSubrouteId == newSubrouteId))
-      {
+      if ((!_.isNumber(previousSubrouteId) && !_.isNumber(newSubrouteId)) ||
+        (previousSubrouteId == newSubrouteId)) {
         return;
       }
 
-      var toOrdinal = function(value) {
+      var toOrdinal = function (value) {
         return (_.isNumber(value)) ? value + 1 : 0;
       };
 
-      if(toOrdinal(newSubrouteId) > toOrdinal(previousSubrouteId)) {
+      if (toOrdinal(newSubrouteId) > toOrdinal(previousSubrouteId)) {
         return Backbone.history.history.go(toOrdinal(previousSubrouteId) - toOrdinal(newSubrouteId));
       }
 
-      if(_.isNumber(previousSubrouteId) && subroutes[previousSubrouteId]) {
+      if (_.isNumber(previousSubrouteId) && subroutes[previousSubrouteId]) {
         var previousSubroute = subroutes[previousSubrouteId];
 
-        switch(previousSubroute.type) {
+        switch (previousSubroute.type) {
           case 'modal':
             previousSubroute.view.close(true);
             break;
@@ -832,12 +839,12 @@ define(function (require, exports, module) {
       }
 
       this.routeHistory.subrouteId = newSubrouteId;
-      route['subroutes'] = route['subroutes'].slice(0, toOrdinal(newSubrouteId));
+      route.subroutes = route.subroutes.slice(0, toOrdinal(newSubrouteId));
     },
 
-    isCurrentSubrouteView: function(view) {
-      var subrouteId = this.routeHistory.subrouteId
-      return (_.isNumber(subrouteId) && _.last(this.routeHistory.stack)['subroutes'][subrouteId].view === view);
+    isCurrentSubrouteView: function (view) {
+      var subrouteId = this.routeHistory.subrouteId;
+      return (_.isNumber(subrouteId) && _.last(this.routeHistory.stack).subroutes[subrouteId].view === view);
     },
 
     initialize: function (options) {
@@ -847,8 +854,8 @@ define(function (require, exports, module) {
       this.listenTo(Backbone, 'popstate', this.checkUrlForSubroute);
 
       var historyState = Backbone.history.history.state;
-      if(historyState && _.isNumber(historyState.subrouteId)) {
-        window.history.go(-(historyState.subrouteId+1));
+      if (historyState && _.isNumber(historyState.subrouteId)) {
+        window.history.go(-(historyState.subrouteId + 1));
       }
 
       // TODO: Make this into a function
@@ -857,7 +864,7 @@ define(function (require, exports, module) {
       // TODO: Allow a queue of pending alerts, maybe?
       this.pendingAlert = {};
 
-      //Fade out and remove splash
+      // Fade out and remove splash
       $('body').addClass('initial-load');
       this.tabs = options.tabs;
       this.bookmarks = app.getBookmarks();
@@ -874,9 +881,9 @@ define(function (require, exports, module) {
         }
         // this.extensions[item.id].bind('all', logRoute);
         this.extensions[item].on('route', function () {
-          this.trigger('subroute',item);
+          this.trigger('subroute', item);
           this.trigger('route');
-          this.trigger('route:'+item,item);
+          this.trigger('route:' + item, item);
         }, this);
         // this.tabs.add({title: app.capitalize(item.id), id: item.id, extension: true});
       }, this);
@@ -884,7 +891,7 @@ define(function (require, exports, module) {
       var tabs = new Tabs.View({collection: this.tabs});
       var bookmarks = new Bookmarks.View({collection: this.bookmarks});
 
-      //Top
+      // Top
       var Navbar = Backbone.Layout.extend({
         template: 'navbar',
 
@@ -928,5 +935,4 @@ define(function (require, exports, module) {
   });
 
   return Router;
-
 });
