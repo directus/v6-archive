@@ -16,6 +16,9 @@ define([
 ], function (View, UIComponent) {
   'use strict';
 
+  /**
+   * Although it uses Backbone's `extend` functionality, UIComponent is in fact a regular object
+   */
   return UIComponent.extend({
     id: 'interface-name',
     dataTypes: ['INT', 'TINYINT', 'SMALLINT', 'MEDIUMINT', 'BIGINT'],
@@ -190,3 +193,24 @@ The full set of options and methods:
 ```
 
 ## Template
+The Handlebars template that is being rendered in the views HTML tag. This template has access to all data passed through in the `serialize` method of the UIView.
+
+```html
+<style type="text/css">
+	input[type=range] {
+		display: inline-block;
+		vertical-align: middle;
+		background-color: transparent;
+	}
+
+	input[type=range]:disabled {
+		opacity: 0.6 !important;
+	}
+
+	span.slider-value {
+		margin-left: 10px;
+		width: auto !important;
+	}
+</style>
+<input type="range" value="{{value}}" name="{{name}}" id="{{name}}" min="{{min}}" max="{{max}}" step="{{step}}" {{#if readOnly}}readonly{{/if}}><span class="slider-value">{{value}} {{unit}}</span>
+```
