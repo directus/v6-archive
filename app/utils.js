@@ -11,10 +11,6 @@ define(['underscore'], function (_) {
 
   var Utils = {};
 
-  Utils.convertToBoolean = function (value) {
-    return value == null ? false : value != false;
-  };
-
   Utils.isEmpty = function (value) {
     return value == null || value === '';
   };

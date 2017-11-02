@@ -17,7 +17,7 @@ define(['underscore', 'utils', 'core/UIView'], function (_, Utils, UIView) {
       var hasValue = Utils.isSomething(this.value);
       var nullable = this.columnSchema.isNullable();
 
-      if ((hasValue || this.value === null && nullable)  && (this.model.isNew() || this.model.hasChanges(this.name))) {
+      if ((hasValue || this.value === null && nullable) && (this.model.isNew() || this.model.hasChanges(this.name))) {
         return this.value;
       }
     },
@@ -30,7 +30,7 @@ define(['underscore', 'utils', 'core/UIView'], function (_, Utils, UIView) {
       }
 
       if (!_.isBoolean(value)) {
-        value = Utils.convertToBoolean(value);
+        value = Boolean(value);
       }
 
       return {
