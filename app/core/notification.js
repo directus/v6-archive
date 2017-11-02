@@ -32,17 +32,28 @@ define([
 
     var titleText = '';
     if (title) {
-      titleText += '<b>'+title+'</b><br>';
+      titleText += '<b>' + title + '</b><br>';
     }
 
     details = StringHelper.parse(details);
-    options.text = titleText+details;
+    options.text = titleText + details;
 
     return noty(options);
   }
 
+  // Source: https://github.com/petkaantonov/bluebird/wiki/Optimization-killers#3-managing-arguments
+  var argumentsToArray = function (argObject) {
+    var args = new Array(argObject.length);
+
+    for (var i = 0; i < args.length; i++) {
+      args[i] = argObject[i];
+    }
+
+    return args;
+  };
+
   function addTypeArgument(args, type) {
-    args = Utils.argumentsToArray(args);
+    args = argumentsToArray(args);
 
     if (args.length === 1) {
       args.unshift(type);
@@ -53,7 +64,7 @@ define([
     return args;
   }
 
-  //@TODO: Wrap Noty into a Notification Object
+  // @TODO: Wrap Noty into a Notification Object
   function showNotification(options) {
     var args = addTypeArgument(arguments, 'Notification');
 

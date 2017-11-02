@@ -11,17 +11,6 @@ define(['underscore'], function (_) {
 
   var Utils = {};
 
-  // Source: https://github.com/petkaantonov/bluebird/wiki/Optimization-killers#3-managing-arguments
-  Utils.argumentsToArray = function (argObject) {
-    var args = new Array(argObject.length);
-
-    for (var i = 0; i < args.length; i++) {
-      args[i] = argObject[i];
-    }
-
-    return args;
-  };
-
   /**
    * Get array of params in a url
    *
