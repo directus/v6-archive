@@ -1,5 +1,10 @@
-define(['moment'], function (moment) {
-  var helper = {};
+/**
+ * Date Utility functions
+ */
+
+define(function (require, exports, module) {
+  var moment = require('moment');
+  var DateUtil = {};
 
   /**
    * Get start and end date of month of given date object
@@ -13,7 +18,7 @@ define(['moment'], function (moment) {
    * @param  {Object} momentDate A Moment.js Date object
    * @return {Object}            Start and end date
    */
-  helper.getMonthDateRange = function (momentDate) {
+  DateUtil.getMonthDateRange = function (momentDate) {
     var year = momentDate.format('YYYY');
     var month = momentDate.format('M');
 
@@ -41,7 +46,7 @@ define(['moment'], function (moment) {
    * @return {Array}       Array of Moment.js date objects ranging from the
    *                       from till to dates
    */
-  helper.range = function (from, to) {
+  DateUtil.range = function (from, to) {
     var range = [];
 
     var current = from.toDate();
@@ -62,7 +67,7 @@ define(['moment'], function (moment) {
    * @param  {Number} days Days to subtract from the given to date
    * @return {Array}      [description]
    */
-  helper.rangeUntil = function (to, days) {
+  DateUtil.rangeUntil = function (to, days) {
     // remove one day form the given days param to include the `to` date in the
     //   output range
     days = parseInt(days, 10) - 1;
@@ -76,11 +81,11 @@ define(['moment'], function (moment) {
    * @param  {Object} date Moment.js date
    * @return {Boolean}     Given date is today or not
    */
-  helper.isToday = function (date) {
+  DateUtil.isToday = function (date) {
     date = moment(date);
 
     return moment().diff(date, 'days') === 0;
   };
 
-  return helper;
+  module.exports = DateUtil;
 });
