@@ -1,12 +1,5 @@
 define(['utils'], function (Utils) {
   describe('Utils test', function () {
-    it('Should get params', function () {
-      var url = 'https://directus.io/?lang=en&redirect=1';
-      var params = Utils.getParams(url);
-
-      expect(params.length).toBe(2);
-    });
-
     it('Should add new params', function () {
       var url = 'https://directus.io/';
 

@@ -12,24 +12,6 @@ define(['underscore'], function (_) {
   var Utils = {};
 
   /**
-   * Get array of params in a url
-   *
-   * @param {string/Location} url
-   * @return {Array} new url
-   */
-  Utils.getParams = function (url) {
-    var location = this.getLocation(url);
-    var querystring = location.search;
-    var params = [];
-
-    if (querystring && querystring.indexOf('?') === 0) {
-      params = querystring.substr(1).split('&');
-    }
-
-    return params;
-  };
-
-  /**
    * Add a param to an url query string
    *
    * @param {string/Location} url
