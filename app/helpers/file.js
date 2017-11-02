@@ -1,51 +1,86 @@
-define(['jquery'], function ($) {
+/**
+ * File Utility functions
+ *
+ * NOTE: Some of these do quite some heavy lifting on the client side.
+ * TODO: Figure out a lighter way to do some of these operations
+ */
 
-  'use strict';
+define(function (require, exports, module) {
+  var $ = require('jquery');
 
-  var FileHelper = {};
+  var FileUtil = {};
 
-  FileHelper.isImage = function(image, fn) {
-    if (this.isFileObject(image)) {
+  /**
+   * Check if a File object is an image or if a URL is pointing to an image file
+   *
+   * NOTE: This function is **very heavy** and will block JS execution for a bit
+   *   when checking larger files
+   *
+   * TODO: Investigate if this regex based solution could replace the Image
+   *   rendering check: https://gist.github.com/bgrins/6194623
+   *
+   * @param  {File|String} imageOrURL          file object or URL string pointing to image
+   * @param {Function(Boolean):void} callback  Fires when check is done
+   */
+  FileUtil.isImage = function (imageOrURL, callback) {
+    if (this.isFileObject(imageOrURL)) {
       var imageType = /image.*/;
-      if (image.type.match(imageType)) {
-        fn(true, image);
+      if (imageOrURL.type.match(imageType)) {
+        callback(true);
       } else {
-        fn(false, image);
+        callback(false);
       }
     } else {
+      // If the provided image isn't a File object, try loading the url in an
+      //   image element and fire the callback on load or on error
       var img = new Image();
-      img.onload = function() {
-        fn(true, image);
+      img.onload = function () {
+        callback(true);
       };
 
-      img.onerror = function() {
-        fn(false, image);
+      img.onerror = function () {
+        callback(false);
       };
 
-      img.src = image;
+      img.src = imageOrURL;
     }
   };
 
-  FileHelper.isFileObject = function(file) {
-    return typeof File !== 'undefined' ? file instanceof File : false;
+  /**
+   * Check if an object is an instance of File
+   * @param  {Object|File} file The object to check against
+   * @return {Boolean}          Provided input is file or not
+   */
+  FileUtil.isFileObject = function (file) {
+    return typeof File === 'undefined' ? false : file instanceof File;
   };
 
-  FileHelper.getDataFromInput = function(inputFile, fn) {
-    var imageDetails = {
+  /**
+   * Get the data:url of a provided file
+   *
+   * NOTE: This function is **very heavy** and will block JS execution for a bit
+   *
+   * @param  {File}   inputFile   The file to convert to data:url
+   * @param  {Function(fileData, details):void} callback
+   */
+  FileUtil.getDataFromInput = function (inputFile, callback) {
+    var details = {
       width: 0,
       height: 0
     };
+
     var self = this;
 
-    this.isImage(inputFile, function(isImage) {
+    this.isImage(inputFile, function (isImage) {
       var reader = new FileReader();
-      reader.onload = function() {
+      reader.onload = function () {
+        // If the file is an image, get additional details from the file
         if (isImage) {
-          self.getImageDetails(reader.result, function(imageDetails) {
-            fn(reader.result,  imageDetails, inputFile);
+          self.getImageDetails(reader.result, function (details) {
+            callback(reader.result, details, inputFile);
           });
         } else {
-          fn(reader.result, imageDetails, inputFile);
+          callback(reader.result, details, inputFile);
         }
       };
 
@@ -53,25 +88,25 @@ define(['jquery'], function ($) {
     });
   };
 
-  FileHelper.getDataFromURL = function(url, fn) {
-    var self = this;
-    this.isImage(url, function(isImage) {
-      self.getImageDetails(url, function(imageDetails) {
-        imageDetails.name = imageDetails.title = url.substring(url.lastIndexOf('/')+1);
-        fn(url, imageDetails);
-      });
-    });
-  };
-
-  FileHelper.getImageDetails = function(image, fn) {
+  /**
+   * Extract details about the given image
+   *
+   * Details include the fileData string and the dimensions of the image
+   *
+   * NOTE: This function is **very heavy** and will block JS execution for a bit
+   *
+   * @param  {String}   image fileData string to render
+   * @param  {Function(details, image)} callback
+   */
+  FileUtil.getImageDetails = function (image, callback) {
     var img = new Image();
     var self = this;
 
-    img.onerror = function() {
-      fn(null, image);
+    img.onerror = function () {
+      callback(null, image);
     };
 
-    img.onload = function() {
+    img.onload = function () {
       var details = {
         width: this.width,
         height: this.height
@@ -87,19 +122,28 @@ define(['jquery'], function ($) {
       details.data = dataurl;
       details.size = self.getSizeFromData(dataurl);
 
-      fn(details, image);
+      callback(details, image);
     };
 
     img.src = image;
   };
 
-  // this method try to fit a image
-  // into a box [width]x[height]
-  // no fancy resizing
-  FileHelper.resizeFromData = function(image, thumbnailWidth, thumbnailHeight, fn) {
+  /**
+   * Resize a provided image to fit (contain) inside the given dimensions
+   *
+   * NOTE: This function is **very heavy** and will block JS execution for a bit
+   * TODO: Since we only use the output of this method for display purposes on the
+   *   front-end, we should investigate if we can make it work with CSS (object-fit: contain)
+   *
+   * @param  {String}   image           fileData of image
+   * @param  {Number}   thumbnailWidth  width dimension in px
+   * @param  {Number}   thumbnailHeight height dimension in px
+   * @param  {Function(String|null)} callback
+   */
+  FileUtil.resizeFromData = function (image, thumbnailWidth, thumbnailHeight, callback) {
     var img = new Image();
 
-    img.onload = function() {
+    img.onload = function () {
       var MAX_WIDTH = thumbnailWidth;
       var MAX_HEIGHT = thumbnailHeight;
       var width = this.width;
@@ -111,13 +155,13 @@ define(['jquery'], function ($) {
         if (width > MAX_WIDTH) {
           width *= MAX_HEIGHT / height;
           height = MAX_HEIGHT;
-          x = -(width/2 - MAX_WIDTH/2);
+          x = -((width / 2) - (MAX_WIDTH / 2));
         }
       } else if (width < height) {
         if (height > MAX_HEIGHT) {
           height *= MAX_WIDTH / width;
           width = MAX_WIDTH;
-          y = -(height/2 - MAX_HEIGHT/2);
+          y = -((height / 2) - (MAX_HEIGHT / 2));
         }
       } else {
         width = MAX_WIDTH;
@@ -131,41 +175,48 @@ define(['jquery'], function ($) {
       ctx.drawImage(img, x, y, width, height);
 
       var dataurl = canvas.toDataURL('image/jpg');
-      fn(dataurl);
+      callback(dataurl);
     };
 
-    img.onerror = function() {
-      fn(null);
+    img.onerror = function () {
+      callback(null);
     };
 
     img.src = image;
   };
 
-  // Source: https://en.wikipedia.org/wiki/Base64#MIME
-  // The size of the decoded data can be approximated with this formula:
-  FileHelper.getSizeFromData = function(data) {
-    return (data.length - 814) / 1.37;
+  /**
+   * Get amount of bytes from fileData string
+   *
+   * Source: https://en.wikipedia.org/wiki/Base64#MIME
+   *
+   * @param  {String} fileData
+   * @return {Number}          size of the fileData in bytes
+   */
+  FileUtil.getSizeFromData = function (fileData) {
+    return (fileData.length - 814) / 1.37;
   };
 
-  FileHelper.readableBytes = function(size, precision) {
-    var info = this.humanBytesInfo(size, precision);
-
-    return info.size + ' ' + info.unit;
-  };
-
-  FileHelper.humanBytesInfo = function(size, precision) {
+  /**
+   * Convert a size value in bytes to an object containing the size rounded and
+   *   fixed to a set amount of decimals and the unit
+   * @param  {Number} size      size in bytes
+   * @param  {Number} precision amount of decimals
+   * @return {Object}           Human readable size and unit
+   */
+  FileUtil.humanBytesInfo = function (size, precision) {
     precision = precision || 0;
     var i = 0;
     var humanSize;
     var unit;
 
-    while ((size/1024) > 0.9) {
+    while ((size / 1024) > 0.9) {
       size /= 1024;
       i++;
     }
 
     humanSize = Math.round(size);
-    unit = getUnit(i);
+    unit = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'][i];
 
     return {
       size: humanSize.toFixed(precision),
@@ -173,46 +224,74 @@ define(['jquery'], function ($) {
     };
   };
 
-  FileHelper.humanReadableSize = function (size, precision) {
+  /**
+   * Run the humanBytesInfo method and return the result as a string instead
+   *   of an object
+   *
+   * TODO: Do we need this extra method just to stitch the values?
+   *
+   * @param  {Number} size      size in bytes
+   * @param  {Number} precision amount of decimals
+   * @return {String}           Human readable size and unit
+   */
+  FileUtil.humanReadableSize = function (size, precision) {
     var info = this.humanBytesInfo(size, precision);
 
     return info.size + info.unit;
   };
 
-  function getUnit(index) {
-    return ['B','KB','MB','GB','TB','PB','EB','ZB','YB'][index];
-  }
+  /**
+   * Run the humanBytesInfo method and return the result as a string instead
+   *   of an object
+   *
+   * TODO: Do we need this extra method just to stitch the values?
+   *
+   * @param  {Number} size      size in bytes
+   * @param  {Number} precision amount of decimals
+   * @return {String}           Human readable size and unit with a space in between
+   */
+  FileUtil.readableBytes = function (size, precision) {
+    var info = this.humanBytesInfo(size, precision);
 
-  FileHelper.onImageError = function (elements, fn) {
-    $(elements).one('error', function (event) {
-      fn.apply(event.target, [event, event.target]);
-    });
+    return info.size + ' ' + info.unit;
   };
 
-  FileHelper.hideOnImageError = function (elements) {
-    this.onImageError(elements, function () {
+  /**
+   * Add event listener to the passed element which hides the element if it
+   *   fires an error event
+   * @param  {Object} elements jQuery selection of elements
+   */
+  FileUtil.hideOnImageError = function (elements) {
+    $(elements).one('error', function () {
       $(this).hide();
     });
   };
 
-  FileHelper.getSubType = function (mimeType) {
+  /**
+   * Get the subtype from a MIME type
+   * @param  {String} mimeType The full MIME type
+   * @return {String}          The subtype
+   */
+  FileUtil.getSubType = function (mimeType) {
     return mimeType.split('/').pop();
   };
 
-  // show jpeg as jpg
-  FileHelper.friendlySubtype = function (type) {
+  /**
+   * Get the subtype, but change JPEG to JPG
+   * @param  {String} mimeType The full MIME type
+   * @return {String}          The subtype
+   */
+  FileUtil.friendlySubtype = function (type) {
     type = (type || '').toLowerCase();
 
-    // if mime type is passed instead of a subtype
     type = this.getSubType(type);
 
-    switch (type) {
-      case 'jpeg':
-        type = 'jpg';
+    if (type === 'jpeg') {
+      type = 'jpg';
     }
 
     return type;
   };
 
-  return FileHelper;
+  module.exports = FileUtil;
 });

@@ -8,8 +8,7 @@ define([
   'utils',
   'moment',
   'helpers/file'
-], function(app, _, Backbone, EntriesModel, Notification, __t, Utils, moment, File) {
-
+], function (app, _, Backbone, EntriesModel, Notification, __t, Utils, moment, File) {
   'use strict';
 
   var FilesModel = EntriesModel.extend({
@@ -25,7 +24,7 @@ define([
         if (!url && this.isNew()) {
           url = this.get('data');
         }
-       }
+      }
 
       return url;
     },
@@ -52,14 +51,14 @@ define([
       // TODO: avoid omitting url and html at some point
       // rewrite this so we omit these values when we really want it to be omitted.
       if (all !== true) {
-        atts = this.omitCustomAttrs(atts)
+        atts = this.omitCustomAttrs(atts);
       }
 
       return atts;
     },
 
     omitCustomAttrs: function (attrs) {
-      return _.omit(attrs, 'thumbnailData', 'url', 'file_url', 'file_thumb_url', 'old_thumbnail_url', 'thumbnail_url', 'html', 'embed_url')
+      return _.omit(attrs, 'thumbnailData', 'url', 'file_url', 'file_thumb_url', 'old_thumbnail_url', 'thumbnail_url', 'html', 'embed_url');
     },
 
     formatTitle: function (name) {
@@ -104,8 +103,8 @@ define([
 
       var model = this;
       allowed = true;
-      File.getDataFromInput(file, function(fileData, details, file) {
-        File.isImage(fileData, function(isImage) {
+      File.getDataFromInput(file, function (fileData, details) {
+        File.isImage(fileData, function (isImage) {
           var modelData = {
             id: undefined,
             name: file.name,
@@ -117,7 +116,7 @@ define([
           };
 
           if (isImage) {
-            File.resizeFromData(fileData, 200, 200, function(thumbnailData) {
+            File.resizeFromData(fileData, 200, 200, function (thumbnailData) {
               model.set(_.extend(modelData, {
                 thumbnailData: thumbnailData,
                 width: details.width,
@@ -153,7 +152,7 @@ define([
         return false;
       }
 
-      File.resizeFromData(item.data, 200, 200, function(thumbnailData) {
+      File.resizeFromData(item.data, 200, 200, function (thumbnailData) {
         item.thumbnailData = thumbnailData;
         model.set(item);
 
@@ -165,7 +164,7 @@ define([
 
     setLink: function (url, allowedTypes) {
       var model = this;
-      app.sendLink(url, function(data) {
+      app.sendLink(url, function (data) {
         var item = data[0];
         item[model.table.getStatusColumnName()] = model.table.getStatusDefaultValue();
         // item[app.statusMapping.status_name] = app.statusMapping.active_num;
@@ -252,7 +251,7 @@ define([
 
       // TODO: This model should only use its own subtype
       if (_.isString(friendly)) {
-        type  = friendly;
+        type = friendly;
       } else {
         type = this.get('type');
       }

@@ -1,9 +1,10 @@
 define([
   'app',
+  'jquery',
   'underscore',
   'backbone',
   'handlebars',
-  "core/directus",
+  'core/directus',
   'core/BasePageView',
   'helpers/file',
   'core/widgets/widgets',
@@ -11,8 +12,7 @@ define([
   'moment'
 ],
 
-function(app, _, Backbone, Handlebars, Directus, BasePageView, FileHelper, Widgets, __t, moment) {
-
+function (app, $, _, Backbone, Handlebars, Directus, BasePageView, FileHelper, Widgets, __t, moment) {
   'use strict';
 
   var BodyView = Backbone.Layout.extend({
@@ -42,7 +42,7 @@ function(app, _, Backbone, Handlebars, Directus, BasePageView, FileHelper, Widge
       app.router.openUserModal(id);
     },
 
-    serialize: function() {
+    serialize: function () {
       var rows = this.collection.map(function (model) {
         var data = {
           id: model.get('id'),
@@ -91,7 +91,7 @@ function(app, _, Backbone, Handlebars, Directus, BasePageView, FileHelper, Widge
 
       var data = [];
 
-      for(var group in groupedData) {
+      for (var group in groupedData) {
         // skip inactive group
         // and push it at the end
         if (group !== 'group_0') {
@@ -101,7 +101,7 @@ function(app, _, Backbone, Handlebars, Directus, BasePageView, FileHelper, Widge
 
       // if exists, push inactive users group at the end
       if (_.has(groupedData, 'group_0')) {
-        data.push(groupedData['group_0']);
+        data.push(groupedData.group_0);
       }
 
       return {
@@ -111,7 +111,7 @@ function(app, _, Backbone, Handlebars, Directus, BasePageView, FileHelper, Widge
     },
 
     afterRender: function () {
-      FileHelper.onImageError(this.$('.js-image img'), function () {
+      $(this.$('.js-image img')).one('error', function (event) {
         var $el = $(this);
 
         $el.attr('data-src', $el.attr('src'));
@@ -120,8 +120,10 @@ function(app, _, Backbone, Handlebars, Directus, BasePageView, FileHelper, Widge
     },
 
     initialize: function (options) {
-      this.listenTo(this.collection, 'sync', function(model, resp, options) {
-        if (options.silent) return;
+      this.listenTo(this.collection, 'sync', function (model, resp, options) {
+        if (options.silent) {
+          return;
+        }
         this.render();
       });
     }
@@ -131,7 +133,7 @@ function(app, _, Backbone, Handlebars, Directus, BasePageView, FileHelper, Widge
 
     headerOptions: {
       route: {
-        title: __t('users'),
+        title: __t('users')
       }
     },
 
@@ -148,7 +150,7 @@ function(app, _, Backbone, Handlebars, Directus, BasePageView, FileHelper, Widge
       ];
     },
 
-    leftToolbar: function() {
+    leftToolbar: function () {
       var widgets = [];
 
       if (app.user.get('group').id === 1) {
@@ -166,12 +168,12 @@ function(app, _, Backbone, Handlebars, Directus, BasePageView, FileHelper, Widge
       }
 
       widgets.push(new Widgets.InfoButtonWidget({enable: false}));
-      widgets.push(new Widgets.FilterButtonWidget);
+      widgets.push(new Widgets.FilterButtonWidget());
 
       return widgets;
     },
 
-    afterRender: function() {
+    afterRender: function () {
       this.setView('#page-content', this.table);
       var status = this.collection.preferences.get('status');
 
@@ -179,7 +181,7 @@ function(app, _, Backbone, Handlebars, Directus, BasePageView, FileHelper, Widge
       this.collection.preferences.set('status', status);
     },
 
-    initialize: function() {
+    initialize: function () {
       this.viewList = false;
       this.widgets = [];
       this.table = new BodyView({
@@ -188,7 +190,5 @@ function(app, _, Backbone, Handlebars, Directus, BasePageView, FileHelper, Widge
     }
   });
 
-
   return View;
-
 });
