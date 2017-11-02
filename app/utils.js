@@ -23,30 +23,6 @@ define(['underscore'], function (_) {
   };
 
   /**
-   * Convert string url into an Location (Anchor) Element.
-   *
-   * @param {string} url
-   * @return {Element} location
-   */
-  Utils.convertURLToLocation = function (url) {
-    var location = document.createElement('a');
-
-    location.href = url;
-
-    return location;
-  };
-
-  /**
-   * Get Location (Anchor) Element or convert url to one.
-   *
-   * @param {string/Location} url
-   * @return {Element} new url
-   */
-  Utils.getLocation = function (url) {
-    return url.href ? url : this.convertURLToLocation(url);
-  };
-
-  /**
    * Get array of params in a url
    *
    * @param {string/Location} url
