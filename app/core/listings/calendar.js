@@ -5,8 +5,7 @@ define([
   'moment',
   'core/t',
   'helpers/date'
-], function(app, _, BaseView, moment, __t, DateHelper) {
-
+], function (app, _, BaseView, moment, __t, DateHelper) {
   var viewId = 'calendar';
 
   return {
@@ -36,7 +35,7 @@ define([
         this.navigate(id);
       },
 
-      prev: function() {
+      prev: function () {
         var self = this;
         this.state.currentDate = moment(this.state.currentDate).add(-1, 'months');
         this.updateCalendar().then(function () {
@@ -44,7 +43,7 @@ define([
         });
       },
 
-      next: function() {
+      next: function () {
         var self = this;
         this.state.currentDate = moment(this.state.currentDate).add(1, 'months');
         this.updateCalendar().then(function () {
@@ -52,7 +51,7 @@ define([
         });
       },
 
-      updateCalendar: function() {
+      updateCalendar: function () {
         this.updateDateRangeFilter();
 
         var xhr = this.collection.fetch(this.fetchOptions);
@@ -69,17 +68,17 @@ define([
         return this.updateCalendar();
       },
 
-      optionsStructure: function() {
+      optionsStructure: function () {
         var options = {
           datetime: {},
           title: {}
         };
 
-        _.each(this.dateColumns(), function(column) {
+        _.each(this.dateColumns(), function (column) {
           options.datetime[column.id] = app.capitalize(column.id);
         });
 
-        _.each(this.titleColumns(), function(column) {
+        _.each(this.titleColumns(), function (column) {
           options.title[column.id] = app.capitalize(column.id);
         });
 
@@ -105,10 +104,10 @@ define([
               }
             }
           ]
-        }
+        };
       },
 
-      serialize: function() {
+      serialize: function () {
         // @TODO: Clean this process
         var date = this.state.currentDate;
         var data = {};
@@ -131,17 +130,17 @@ define([
         var dayOfTheWeek = parseInt(moment(startDate).format('d'), 10);
         var daysInTheMonth = moment(date).daysInMonth();
         var daysInPreviousMonth = moment(date).add(-1, 'months').daysInMonth();
-        var weeksInTheMonth = (daysInTheMonth/7)+1;
+        var weeksInTheMonth = (daysInTheMonth / 7) + 1;
 
-        for (i=0; i<weeksInTheMonth; i++) {
+        for (i = 0; i < weeksInTheMonth; i++) {
           weeks[i] = {
             days: []
           };
         }
 
         // empty calendar cells
-        var day = (daysInPreviousMonth-dayOfTheWeek)+1;
-        for (i=1; i<=dayOfTheWeek; i++) {
+        var day = (daysInPreviousMonth - dayOfTheWeek) + 1;
+        for (i = 1; i <= dayOfTheWeek; i++) {
           weeks[0].days.push({
             day: day,
             isToday: false,
@@ -153,8 +152,8 @@ define([
 
         var weekIndex;
         i = dayOfTheWeek;
-        for (day=1; day <= daysInTheMonth; day++) {
-          weekIndex = parseInt(i/7, 10);
+        for (day = 1; day <= daysInTheMonth; day++) {
+          weekIndex = parseInt(i / 7, 10);
 
           if (!weeks[weekIndex]) {
             weeks[weekIndex] = {
@@ -177,7 +176,7 @@ define([
         var lastWeekDays = i = weeks[weekIndex].days.length;
         day = 1;
         if (lastWeekDays < 7) {
-          while(i < 7 ) {
+          while (i < 7) {
             weeks[weekIndex].days.push({
               day: day,
               isToday: false,
@@ -194,39 +193,39 @@ define([
         return data;
       },
 
-      getDateColumn: function() {
+      getDateColumn: function () {
         var viewOptions = this.getViewOptions();
         var column;
 
         if (viewOptions.date_column) {
           column = this.collection.structure.get(viewOptions.date_column);
         } else {
-          column = _.first(this.dateColumns())
+          column = _.first(this.dateColumns());
         }
 
         return column;
       },
 
-      getTitleColumn: function() {
+      getTitleColumn: function () {
         var viewOptions = this.getViewOptions();
         var column;
 
         if (viewOptions.title_column) {
           column = this.collection.structure.get(viewOptions.title_column);
         } else {
-          column = _.first(this.titleColumns())
+          column = _.first(this.titleColumns());
         }
 
         return column;
       },
 
-      getDayData: function(day) {
+      getDayData: function (day) {
         var dateColumn = this.getDateColumn();
         var titleColumn = this.getTitleColumn();
         var isUsingDateTime = this.state.isUsingDateTime;
         var data = [];
 
-        this.collection.each(function(model) {
+        this.collection.each(function (model) {
           var date = dateColumn ? model.get(dateColumn.id) : null;
           var published = !model.isSubduedInListing();
           var timeFormat = moment.localeData().longDateFormat('LT');
@@ -243,30 +242,30 @@ define([
           }
         });
 
-        return _.sortBy(data, function(item) {
+        return _.sortBy(data, function (item) {
           return item.fullDate;
         });
       },
 
-      dateColumns: function() {
-        return this.collection.structure.filter(function(model) {
+      dateColumns: function () {
+        return this.collection.structure.filter(function (model) {
           return _.contains(['DATETIME', 'DATE'], model.get('type'));
         });
       },
 
-      titleColumns: function() {
-        return this.collection.structure.filter(function(model) {
+      titleColumns: function () {
+        return this.collection.structure.filter(function (model) {
           return _.contains(['VARCHAR'], model.get('type'));
         });
       },
 
-      isUsingDateTime: function() {
+      isUsingDateTime: function () {
         var column = this.getDateColumn();
 
         return column.get('type') === 'DATETIME';
       },
 
-      onPreferencesUpdated: function() {
+      onPreferencesUpdated: function () {
         this.state.isUsingDateTime = this.isUsingDateTime();
         this.render();
       },
@@ -275,19 +274,19 @@ define([
         this.fetchOptions = {};
       },
 
-      bindEvents: function() {
+      bindEvents: function () {
         this.collection.on('sync', this.render, this);
         this.collection.preferences.on('sync', this.onPreferencesUpdated, this);
       },
 
-      unbindEvents: function() {
+      unbindEvents: function () {
         this.collection.off('sync', this.render, this);
         this.collection.preferences.off('sync', this.onPreferencesUpdated, this);
       },
 
-      updateDateRangeFilter: function(date) {
+      updateDateRangeFilter: function (date) {
         var momentDate = moment(date || this.state.currentDate);
-        var range = DateHelper.monthDateRange(momentDate, true);
+        var range = DateHelper.getMonthDateRange(momentDate, true);
         var filters = {};
         filters[this.getDateColumn().id] = {between: range.start + ',' + range.end};
 
@@ -300,7 +299,7 @@ define([
         this.fetchOptions = _.extend(this.fetchOptions || {}, options);
       },
 
-      initialize: function() {
+      initialize: function () {
         this.state = _.extend(this.state, {
           // @TODO: change this date to be a moment object
           currentDate: moment().format(),
@@ -310,5 +309,5 @@ define([
         this.updateDateRangeFilter(moment(this.state.currentDate));
       }
     })
-  }
+  };
 });

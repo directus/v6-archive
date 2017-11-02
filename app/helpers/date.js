@@ -1,31 +1,37 @@
 define(['moment'], function (moment) {
-
   var helper = {};
 
-  // source: http://stackoverflow.com/a/26131085
-  helper.monthDateRange = function (year, month, value) {
-    if (moment.isMoment(year)) {
-      var m = year;
+  /**
+   * Get start and end date of month of given date object
+   *
+   * Exports dates in string format like follows:
+   * 2017-11-01 00:00:00
+   * 2017-11-30 23:59:59
+   *
+   * http://stackoverflow.com/a/26131085
+   *
+   * @param  {Object} momentDate A Moment.js Date object
+   * @return {Object}            Start and end date
+   */
+  helper.getMonthDateRange = function (momentDate) {
+    var year = momentDate.format('YYYY');
+    var month = momentDate.format('M');
 
-      value = month;
-      year = m.format('YYYY');
-      month = m.format('M');
-    }
-
-    // month in moment is 0 based
+    // Create new moment date object based on the start date
+    //   Months are 0 based, so subtract 1 to get the right month in the output
     var startDate = moment([year, month - 1]);
 
-    // Clone the value before .endOf()
+    // .endOf alters the original moment date object, so clone it by creating
+    //   a new moment object of the existing one to prevent the original one
+    //   from being overridden
     var endDate = moment(startDate).endOf('month');
 
-    if (value === true) {
-      // NOTE: Add time so dates are inclusive
-      startDate = startDate.format('YYYY-MM-DD') + ' 00:00:00';
-      endDate = endDate.format('YYYY-MM-DD') + ' 23:59:59';
-    }
+    // Format output dates to the following format:
+    //   2017-11-02 00:00:00
+    startDate = startDate.format('YYYY-MM-DD') + ' 00:00:00';
+    endDate = endDate.format('YYYY-MM-DD') + ' 23:59:59';
 
-    // make sure to call toDate() for plain JavaScript date type
-    return { start: startDate, end: endDate };
+    return {start: startDate, end: endDate};
   };
 
   helper.range = function (from, to) {
