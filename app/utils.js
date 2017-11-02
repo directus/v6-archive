@@ -7,7 +7,6 @@
 //  http://www.getdirectus.com
 
 define(['underscore'], function (_) {
-
   'use strict';
 
   var Utils = {};
@@ -86,14 +85,14 @@ define(['underscore'], function (_) {
    *
    * @return {String} new url
    */
-  Utils.addParam = function(url, key, value, encodeKey, encodeValue) {
+  Utils.addParam = function (url, key, value, encodeKey, encodeValue) {
     var location = this.getLocation(url);
     var params = this.getParams(url);
     var keyExistsAtIndex = -1;
     var paramFound = null;
 
-    encodeKey = typeof encodeKey === 'undefined' ? true : !!encodeKey;
-    encodeValue = typeof encodeValue  === 'undefined' ? true : !!encodeValue;
+    encodeKey = typeof encodeKey === 'undefined' ? true : Boolean(encodeKey);
+    encodeValue = typeof encodeValue === 'undefined' ? true : Boolean(encodeValue);
 
     if (params) {
       for (var index in params) {
@@ -111,12 +110,12 @@ define(['underscore'], function (_) {
     value = encodeValue ? encodeURIComponent(value) : value;
 
     if (keyExistsAtIndex >= 0) {
-      params[keyExistsAtIndex] = paramFound[0]+'='+value;
+      params[keyExistsAtIndex] = paramFound[0] + '=' + value;
     } else {
-      params.push(key+'='+value);
+      params.push(key + '=' + value);
     }
 
-    location.search = '?'+params.join('&');
+    location.search = '?' + params.join('&');
 
     return location.href;
   };
@@ -130,10 +129,10 @@ define(['underscore'], function (_) {
   };
 
   Utils.isNothing = function (value) {
-    return value === undefined
-        || value === null
-        || value === ''
-        || (!_.isNumber(value)  && !_.isDate(value) && _.isEmpty(value) && !_.isBoolean(value));
+    return value === undefined ||
+        value === null ||
+        value === '' ||
+        (!_.isNumber(value) && !_.isDate(value) && _.isEmpty(value) && !_.isBoolean(value));
   };
 
   Utils.isSomething = function (value) {
@@ -149,7 +148,7 @@ define(['underscore'], function (_) {
     var result;
 
     if (lastSeparator) {
-      result = list.slice(0, -1).join(', ') + ' ' + lastSeparator +  ' ' + list.slice(-1);
+      result = list.slice(0, -1).join(', ') + ' ' + lastSeparator + ' ' + list.slice(-1);
     } else {
       result = list.join(separator);
     }
@@ -164,7 +163,7 @@ define(['underscore'], function (_) {
       // remove the spaces between the variables
       // to avoid invalid variable name
       return value.slice(2, -2).trim();
-    })
+    });
   };
 
   // NOTE: This are meant to work with single line csv
@@ -173,9 +172,9 @@ define(['underscore'], function (_) {
 
     options.trim = options.trim === undefined ? true : options.trim;
 
-    return (string  || '').split(',').map(function (name) {
+    return (string || '').split(',').map(function (name) {
       if (options.trim === true) {
-        name = name.trim()
+        name = name.trim();
       }
 
       return name;
@@ -195,68 +194,43 @@ define(['underscore'], function (_) {
     }
 
     while (true) {
-        var atPos = string.indexOf('@[');
+      var atPos = string.indexOf('@[');
 
-        if (atPos !== -1) {
-          var spacePos = string.substring(atPos).indexOf(' ');
+      if (atPos !== -1) {
+        var spacePos = string.substring(atPos).indexOf(' ');
 
-          if (spacePos !== -1) {
-            var substring = string.substring(atPos + 2, spacePos + atPos);
-            var contains = /^[0-9]|_+$/.test(substring);
+        if (spacePos !== -1) {
+          var substring = string.substring(atPos + 2, spacePos + atPos);
+          var contains = /^[0-9]|_+$/.test(substring);
 
-            if (contains) {
-              var bracketPos2 = string.indexOf(']');
+          if (contains) {
+            var bracketPos2 = string.indexOf(']');
 
-              if (bracketPos2 !== -1) {
-                var name = string.substring(spacePos + 1 + atPos, bracketPos2);
-                var newTitle = parsedString;
-                var newOffset;
+            if (bracketPos2 !== -1) {
+              var name = string.substring(spacePos + 1 + atPos, bracketPos2);
+              var newTitle = parsedString;
+              var newOffset;
 
-                if (html === true) {
-                  name = '<span class="mention-tag">' + name + '</span>';
-                }
-
-                parsedString = newTitle.substring(0, atPos + offset) + name;
-                newOffset = parsedString.length;
-                parsedString += newTitle.substring(bracketPos2 + offset + 1);
-                string = newTitle.substring(bracketPos2 + offset + 1);
-                offset = newOffset;
-
-                continue;
+              if (html === true) {
+                name = '<span class="mention-tag">' + name + '</span>';
               }
+
+              parsedString = newTitle.substring(0, atPos + offset) + name;
+              newOffset = parsedString.length;
+              parsedString += newTitle.substring(bracketPos2 + offset + 1);
+              string = newTitle.substring(bracketPos2 + offset + 1);
+              offset = newOffset;
+
+              continue;
             }
           }
         }
+      }
 
-        break;
+      break;
     }
 
     return parsedString;
-  };
-
-  Utils.repeatString = function (string, times) {
-    return Array(times + 1).join(string);
-  };
-
-  Utils.pad = function (position, string, fillString, times) {
-    var fill = this.repeatString(fillString, times);
-    var result;
-
-    if (position === 'right') {
-      result = string + fill;
-    } else {
-      result = fill + string;
-    }
-
-    return result.slice(-times);
-  };
-
-  Utils.leftPad = function (string, fillString, times) {
-    return this.pad('left', string, fillString, times);
-  };
-
-  Utils.rightPad = function (string, fillString, times) {
-    return this.pad('right', string, fillString, times);
   };
 
   return Utils;

@@ -47,7 +47,7 @@ define([
         step = 'any';
 
         if (scale > 0) {
-          step = '0.' + Utils.repeatString('0', scale - 1) + '1';
+          step = '0.' + '0'.repeat(scale - 1) + '1';
         }
       }
 
