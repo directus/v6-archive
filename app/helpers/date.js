@@ -34,35 +34,52 @@ define(['moment'], function (moment) {
     return {start: startDate, end: endDate};
   };
 
+  /**
+   * Get array of Moment.js date objects between from and to dates
+   * @param  {Object} from Start date in range. Moment.js date object
+   * @param  {Object} to   End date in range. Moment.js date object
+   * @return {Array}       Array of Moment.js date objects ranging from the
+   *                       from till to dates
+   */
   helper.range = function (from, to) {
     var range = [];
-    from = moment(from);
-    to = moment(to);
 
     var current = from.toDate();
     while (current <= to.toDate()) {
       range.push(moment(current));
+
+      // Increment the to-be-processed date by 1 day
       current = new Date(current.setDate(current.getDate() + 1));
     }
 
     return range;
   };
 
+  /**
+   * Get array of Moment.js date objects between a given to date and a number
+   *   of days before that date
+   * @param  {Object} to   Moment.js date object
+   * @param  {Number} days Days to subtract from the given to date
+   * @return {Array}      [description]
+   */
   helper.rangeUntil = function (to, days) {
-    var from;
-
-    // remove one day to include `to` date
+    // remove one day form the given days param to include the `to` date in the
+    //   output range
     days = parseInt(days, 10) - 1;
-    to = moment(to);
-    from = moment().subtract(days, 'days');
+    var from = moment().subtract(days, 'days');
 
     return this.range(from, to);
   };
 
+  /**
+   * Check if a given date object is today
+   * @param  {Object} date Moment.js date
+   * @return {Boolean}     Given date is today or not
+   */
   helper.isToday = function (date) {
     date = moment(date);
 
-    return moment().diff(date, 'days') == 0;
+    return moment().diff(date, 'days') === 0;
   };
 
   return helper;
