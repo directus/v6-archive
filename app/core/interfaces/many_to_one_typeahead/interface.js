@@ -49,6 +49,16 @@ define(['app', 'handlebars', 'core/UIView', 'utils'], function (app, Handlebars,
       };
     },
 
+    encodeQueryParams: function (data) {
+      var params = [];
+
+      _.each(data, function (value, key) {
+        params.push(encodeURIComponent(key) + '=' + encodeURIComponent(value));
+      });
+
+      return params.join('&');
+    },
+
     afterRender: function () {
       var self = this;
       var url = app.API_URL + 'tables/' + this.collection.table.id + '/typeahead/';
@@ -68,7 +78,7 @@ define(['app', 'handlebars', 'core/UIView', 'utils'], function (app, Handlebars,
         params[model.table.getStatusColumnName()] = status;
       }
 
-      var urlParams = Utils.encodeQueryParams(params);
+      var urlParams = this.encodeQueryParams(params);
       if (urlParams) {
         url += '?' + urlParams;
       }

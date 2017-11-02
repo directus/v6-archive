@@ -11,16 +11,6 @@ define(['underscore'], function (_) {
 
   var Utils = {};
 
-  Utils.encodeQueryParams = function (data) {
-    var params = [];
-
-    _.each(data, function (value, key) {
-      params.push(encodeURIComponent(key) + '=' + encodeURIComponent(value));
-    });
-
-    return params.join('&');
-  };
-
   // Source: https://github.com/petkaantonov/bluebird/wiki/Optimization-killers#3-managing-arguments
   Utils.argumentsToArray = function (argObject) {
     var args = new Array(argObject.length);
