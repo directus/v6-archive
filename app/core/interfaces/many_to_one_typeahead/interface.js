@@ -90,7 +90,7 @@ define(['app', 'handlebars', 'core/UIView', 'utils'], function (app, Handlebars,
           url: url,
           ttl: 0
         },
-        remote: Utils.addParam(url, 'q', '%QUERY', true, false),
+        remote: url + '&q=' + encodeURIComponent('%QUERY'),
         dupDetector: function (remoteMatch, localMatch) {
           return remoteMatch.value === localMatch.value;
         }

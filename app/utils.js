@@ -11,52 +11,6 @@ define(['underscore'], function (_) {
 
   var Utils = {};
 
-  /**
-   * Add a param to an url query string
-   *
-   * @param {string/Location} url
-   * @param {string} key - Param key
-   * @param {string} value - New param value
-   * @param {boolean} [encodeKey=true] - Whether to encode the param key.
-   * @param {boolean} [encodeValue=true] - Whether to encode the param value.
-   *
-   * @return {String} new url
-   */
-  Utils.addParam = function (url, key, value, encodeKey, encodeValue) {
-    var location = this.getLocation(url);
-    var params = this.getParams(url);
-    var keyExistsAtIndex = -1;
-    var paramFound = null;
-
-    encodeKey = typeof encodeKey === 'undefined' ? true : Boolean(encodeKey);
-    encodeValue = typeof encodeValue === 'undefined' ? true : Boolean(encodeValue);
-
-    if (params) {
-      for (var index in params) {
-        var param = params[index];
-        var result = param.indexOf('=') ? param.split('=') : param;
-
-        if (result[0] === key || result[0] === encodeURIComponent(key)) {
-          keyExistsAtIndex = index;
-          paramFound = result;
-        }
-      }
-    }
-
-    key = encodeKey ? encodeURIComponent(key) : key;
-    value = encodeValue ? encodeURIComponent(value) : value;
-
-    if (keyExistsAtIndex >= 0) {
-      params[keyExistsAtIndex] = paramFound[0] + '=' + value;
-    } else {
-      params.push(key + '=' + value);
-    }
-
-    location.search = '?' + params.join('&');
-
-    return location.href;
-  };
-
   Utils.convertToBoolean = function (value) {
     return value == null ? false : value != false;
   };
