@@ -8,7 +8,6 @@ define([
   'core/t',
   'utils'
 ], function (app, Backbone, _, Handlebars, UIView, __t, Utils) {
-
   'use strict';
 
   return UIView.extend({
@@ -73,12 +72,22 @@ define([
       }
     },
 
+    getTemplateVariables: function (string) {
+      var variables = (string || '').match(/{{([^{}]+)}}/g);
+
+      return (variables || []).map(function (value) {
+        // remove the spaces between the variables
+        // to avoid invalid variable name
+        return value.slice(2, -2).trim();
+      });
+    },
+
     serialize: function () {
       var columnTemplate = this.options.settings.get('visible_column_template');
-      var templateColumns = Utils.getTemplateVariables(columnTemplate);
+      var templateColumns = this.getTemplateVariables(columnTemplate);
       var optionTemplate = Handlebars.compile(columnTemplate);
       var defaultValue = this.options.schema.get('default_value');
-      var placeholderAvailable = !!this.options.settings.get('placeholder') && this.options.settings.get('placeholder').length > 0;
+      var placeholderAvailable = Boolean(this.options.settings.get('placeholder')) && this.options.settings.get('placeholder').length > 0;
       var value = this.options.value || defaultValue;
 
       if (value instanceof Backbone.Model) {

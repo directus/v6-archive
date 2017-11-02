@@ -156,16 +156,6 @@ define(['underscore'], function (_) {
     return result;
   };
 
-  Utils.getTemplateVariables = function (string) {
-    var variables = (string || '').match(/{{([^{}]+)}}/g);
-
-    return (variables || []).map(function (value) {
-      // remove the spaces between the variables
-      // to avoid invalid variable name
-      return value.slice(2, -2).trim();
-    });
-  };
-
   // NOTE: This are meant to work with single line csv
   Utils.parseCSV = function (string, options) {
     options || (options = {});
