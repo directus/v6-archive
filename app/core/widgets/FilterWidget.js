@@ -7,7 +7,6 @@ define([
   'helpers/sort',
   'handlebars'
 ], function (app, __t, Backbone, _, Utils, SortHelper, Handlebars) {
-
   'use strict';
 
   return Backbone.View.extend({
@@ -17,7 +16,7 @@ define([
     tagName: 'div',
 
     attributes: {
-      'class': 'filter help',
+      class: 'filter help',
       'data-help': 'The filter area is used to find specific items within large datasets.'
     },
 
@@ -284,7 +283,7 @@ define([
       };
 
       if ($element.is(':checkbox')) {
-        if($element.prop('checked')) {
+        if ($element.prop('checked')) {
           data.value = 1;
         } else {
           data.value = 0;
@@ -308,8 +307,8 @@ define([
       this.saveFilterString();
     },
 
-    getFilterDataType: function(selectedColumn) {
-      if(!selectedColumn || !this.collection.structure.get(selectedColumn)) {
+    getFilterDataType: function (selectedColumn) {
+      if (!selectedColumn || !this.collection.structure.get(selectedColumn)) {
         return;
       }
 
@@ -317,7 +316,7 @@ define([
       var columnModelType = columnModel.get('type');
       var newInput;
 
-      switch(columnModelType) {
+      switch (columnModelType) {
         case 'DATE':
         case 'DATETIME':
         case 'TIMESTAMP':
@@ -333,19 +332,19 @@ define([
       return newInput;
     },
 
-    addNewFilter: function(selectedColumn) {
+    addNewFilter: function (selectedColumn) {
       var $filters = $('.advanced-search-fields-row');
       var that = this;
       var data = {};
 
       data.columnName = selectedColumn;
 
-      if (this.collection.structure.get(selectedColumn).get('ui') === "many_to_one" || that.collection.structure.get(selectedColumn).get('ui') === "many_to_many" || that.collection.structure.get(selectedColumn).get('ui') === "one_to_many") {
+      if (this.collection.structure.get(selectedColumn).get('ui') === 'many_to_one' || that.collection.structure.get(selectedColumn).get('ui') === 'many_to_many' || that.collection.structure.get(selectedColumn).get('ui') === 'one_to_many') {
         var columnModel = this.collection.structure.get(selectedColumn);
         var filterType = columnModel.options.has('filter_type');
 
         if (filterType && columnModel.options.get('filter_type') === 'dropdown') {
-          //Get Related Column Collection
+          // Get Related Column Collection
           data.columnModel = columnModel;
           data.relatedCollection = app.getEntries(columnModel.relationship.get('related_table'));
 
@@ -356,21 +355,23 @@ define([
         } else {
           data.filter_ui = this.getFilterDataType(selectedColumn);
         }
-      } else if(this.collection.structure.get(selectedColumn).get('type') === "ENUM") {
+      } else if (this.collection.structure.get(selectedColumn).get('type') === 'ENUM') {
         var columnModel = this.collection.structure.get(selectedColumn);
-        var vals = columnModel.get('column_type').substring(5, columnModel.get('column_type').length-1);
-        vals = vals.replace(/\'/g, "").split(',');
+        var vals = columnModel.get('column_type').substring(5, columnModel.get('column_type').length - 1);
+        vals = vals.replace(/\'/g, '').split(',');
         data.dropdownValues = vals;
-      } else if(that.collection.structure.get(selectedColumn).get('ui') === "multi_select") {
+      } else if (that.collection.structure.get(selectedColumn).get('ui') === 'multi_select') {
         var columnModel = that.collection.structure.get(selectedColumn);
         var keys = [];
-        for(var k in JSON.parse(columnModel.options.get('options'))) keys.push(k);
+        for (var k in JSON.parse(columnModel.options.get('options'))) {
+          keys.push(k);
+        }
         data.dropdownValues = keys;
       } else {
         data.filter_ui = this.getFilterDataType(selectedColumn);
       }
       data.filter_type = this.collection.structure.get(selectedColumn).get('type');
-      data.filterData = {id: selectedColumn, type: 'like', value:''};
+      data.filterData = {id: selectedColumn, type: 'like', value: ''};
       this.options.filters.push(data);
       this.render();
     },
@@ -390,7 +391,7 @@ define([
       var statusColumnName = table.getStatusColumnName();
       var statusSelected = Utils.parseCSV(this.collection.getFilter('status')) || [1, 2];
 
-      statusSelected = _.map(statusSelected, function(value) {
+      statusSelected = _.map(statusSelected, function (value) {
         return Number(value);
       });
 
@@ -421,7 +422,9 @@ define([
         );
       }
 
-      data.tableColumns.sort(SortHelper.arraySort);
+      data.tableColumns.sort(function (a, b) {
+        return a > b ? 1 : -1;
+      });
 
       var that = this;
       _.each(this.options.filters, function (item, i) {
@@ -440,9 +443,9 @@ define([
           data.filters[i].relatedEntries = _.sortBy(data.filters[i].relatedEntries, 'visible_column_template');
         } else if (item.dropdownValues) {
           data.filters[i].relatedEntries = [];
-          _.each(item.dropdownValues, function(model) {
+          _.each(item.dropdownValues, function (model) {
             data.filters[i].relatedEntries.push({
-              visible_column:model,
+              visible_column: model,
               visible_column_template: model
             });
           });
@@ -456,9 +459,9 @@ define([
             return;
           }
           var template = Handlebars.compile(that.getFilterDataType(data.filters[i].columnName));
-          if(item.filterData) {
-            //Used for Checkboxes since they return 0 string
-            if(item.filterData.value === "0") {
+          if (item.filterData) {
+            // Used for Checkboxes since they return 0 string
+            if (item.filterData.value === '0') {
               item.filterData = 0;
             }
             data.filters[i].filter_ui = template({value: item.filterData.value});
@@ -475,10 +478,10 @@ define([
       return data;
     },
 
-    afterRender: function() {
+    afterRender: function () {
       $('.filter-ui').last().find('input').focus();
       var that = this;
-      _.each(this.options.filters, function(item) {
+      _.each(this.options.filters, function (item) {
         if (!item.columnName) {
           return;
         }
@@ -487,26 +490,26 @@ define([
 
         var table = columnModel.collection.table.id;
         var columns = columnModel.id;
-        var visibleTemplate = '<div>{{'+columnModel.id+'}}</div>';
+        var visibleTemplate = '<div>{{' + columnModel.id + '}}</div>';
 
-        if(columnModel.relationship) {
+        if (columnModel.relationship) {
           table = columnModel.relationship.get('related_table');
           columns = columnModel.options.get('visible_columns');
 
-          visibleTemplate = '<div>'+columnModel.options.get('visible_column_template')+'</div>';
+          visibleTemplate = '<div>' + columnModel.options.get('visible_column_template') + '</div>';
         }
 
-        if(item.relatedCollection || item.dropdownValues) {
-          if(item.filterData) {
+        if (item.relatedCollection || item.dropdownValues) {
+          if (item.filterData) {
             that.$el.find('span[data-filter-id=' + item.columnName + ']').parent().find('.filter_ui').val(item.filterData.value);
           }
         }
 
-        if(['DATETIME', 'DATE', 'TIMESTAMP'].indexOf(item.filter_type) !== -1) {
+        if (['DATETIME', 'DATE', 'TIMESTAMP'].indexOf(item.filter_type) !== -1) {
           return;
         }
 
-        if(!columns) {
+        if (!columns) {
           return;
         }
 
@@ -519,7 +522,7 @@ define([
         var fetchItems = new Bloodhound(bloodHoundOptions);
         fetchItems.initialize();
 
-        var typeaheadSelector = that.$(".filter-form[data-filter-id-master=" + columnModel.id + "] > .filter-ui > input");
+        var typeaheadSelector = that.$('.filter-form[data-filter-id-master=' + columnModel.id + '] > .filter-ui > input');
 
         typeaheadSelector.typeahead({
           minLength: 1,
@@ -527,13 +530,13 @@ define([
           valueKey: columns,
           template: Handlebars.compile(visibleTemplate)
         },
-        {
-          name: 'related-items',
-          displayKey: 'value',
-          source: fetchItems.ttAdapter()
-        });
+          {
+            name: 'related-items',
+            displayKey: 'value',
+            source: fetchItems.ttAdapter()
+          });
 
-        typeaheadSelector.on('typeahead:selected', function(e, datum) {
+        typeaheadSelector.on('typeahead:selected', function (e, datum) {
           that.processFilterChange(e);
         });
       });
@@ -543,44 +546,46 @@ define([
       }
 
       this.setFilterRow();
-      //this.updateFilterDataType(this.$el.find('.adv-search-col-id').val());*/
+      //this.updateFilterDataType(this.$el.find('.adv-search-col-id').val()); */
     },
 
-    mysql_real_escape_string: function(str) {
-      if(!str) {return "";}
+    mysql_real_escape_string: function (str) {
+      if (!str) {
+        return '';
+      }
       return str.replace(/[\0\x08\x09\x1a\n\r"'\\\%]/g, function (char) {
-          switch (char) {
-              case "\0":
-                  return "\\0";
-              case "\x08":
-                  return "\\b";
-              case "\x09":
-                  return "\\t";
-              case "\x1a":
-                  return "\\z";
-              case "\n":
-                  return "\\n";
-              case "\r":
-                  return "\\r";
-              case "\"":
-              case "'":
-              case "\\":
-              case "%":
-                  return "\\"+char; // prepends a backslash to backslash, percent,
+        switch (char) {
+          case '\0':
+            return '\\0';
+          case '\x08':
+            return '\\b';
+          case '\x09':
+            return '\\t';
+          case '\x1a':
+            return '\\z';
+          case '\n':
+            return '\\n';
+          case '\r':
+            return '\\r';
+          case '"':
+          case '\'':
+          case '\\':
+          case '%':
+            return '\\' + char; // prepends a backslash to backslash, percent,
                                     // and double/single quotes
-          }
+        }
       });
     },
 
-    updateFilters: function(bInit) {
-      var filters = this.options.filters.map(function(item) {
+    updateFilters: function (bInit) {
+      var filters = this.options.filters.map(function (item) {
         return item.filterData;
       });
 
       // this.collection.setFilter('adv_search', filters);
       var filtersParams = {};
       var globalParams = {};
-      _.each(filters, function(filter) {
+      _.each(filters, function (filter) {
         if (filter.type) {
           filtersParams[filter.id] = {};
           filtersParams[filter.id][filter.type] = filter.value;
@@ -596,11 +601,11 @@ define([
       }
 
       if (app.router.loadedPreference) {
-        if(this.basePage) {
+        if (this.basePage) {
           this.basePage.removeHolding(this.cid);
         }
       }
-      //this.render();
+      // this.render();
     },
 
     saveFilterString: function () {
@@ -621,9 +626,9 @@ define([
           }
 
           if (search.type) {
-            string.push(search.id.replace(':','\\:') + ":" + search.type.replace(':','\\:') + ":" + String(search.value).replace(':','\\:').replace(',','\\,'));
+            string.push(search.id.replace(':', '\\:') + ':' + search.type.replace(':', '\\:') + ':' + String(search.value).replace(':', '\\:').replace(',', '\\,'));
           } else {
-            string.push(search.id.replace(':','\\:') + ":" + String(search.value).replace(':','\\:').replace(',','\\,'));
+            string.push(search.id.replace(':', '\\:') + ':' + String(search.value).replace(':', '\\:').replace(',', '\\,'));
           }
         });
 
@@ -634,7 +639,6 @@ define([
 
         return preferences[method]({search_string: string}, {silent: true});
       };
-
 
       this.confirmBookmarkAction()
         .done(function () {
@@ -659,18 +663,18 @@ define([
       app.router.getBookmarkView().setActive(route);
     },
 
-    setFilterRow: function(){
-      var $advSearchFieldRow = $(".advanced-search-fields-row");
-      var $advSearchFields = $(".advanced-search-fields");
-          $advSearchFields.on("click", ".remove-adv-row", function(e){
-            $(this).parent().remove();
-          });
+    setFilterRow: function () {
+      var $advSearchFieldRow = $('.advanced-search-fields-row');
+      var $advSearchFields = $('.advanced-search-fields');
+      $advSearchFields.on('click', '.remove-adv-row', function (e) {
+        $(this).parent().remove();
+      });
       this.getFilterRow = $advSearchFieldRow;
     },
 
-    getFilterRow: "adv search fields row object",
+    getFilterRow: 'adv search fields row object',
 
-    updateFiltersFromPreference: function() {
+    updateFiltersFromPreference: function () {
       this.options.filters = [];
       var search = this.collection.preferences.get('search_string');
 
@@ -700,8 +704,8 @@ define([
           if (filter.length === 2) {
             data = {};
             data.filterData = {
-              id: filter[0].replace('%20',':').split('.').shift(),
-              value: filter[1].replace('%20',':').replace('%21',',')
+              id: filter[0].replace('%20', ':').split('.').shift(),
+              value: filter[1].replace('%20', ':').replace('%21', ',')
             };
 
             // Do not add global search filter into the filters list
@@ -712,17 +716,17 @@ define([
             that.options.filters.push(data);
           } else if (filter.length === 3) {
             data = {};
-            var filterColumn = filter[0].replace('%20',':');
+            var filterColumn = filter[0].replace('%20', ':');
             var selectedColumn = filterColumn.split('.').shift();
 
             data.columnName = selectedColumn;
-            if(!that.collection.structure.get(selectedColumn)) {
+            if (!that.collection.structure.get(selectedColumn)) {
               return;
             }
-            if(that.collection.structure.get(selectedColumn).get('ui') === "many_to_one" || that.collection.structure.get(selectedColumn).get('ui') === "many_to_many" || that.collection.structure.get(selectedColumn).get('ui') === "one_to_many") {
+            if (that.collection.structure.get(selectedColumn).get('ui') === 'many_to_one' || that.collection.structure.get(selectedColumn).get('ui') === 'many_to_many' || that.collection.structure.get(selectedColumn).get('ui') === 'one_to_many') {
               var columnModel = that.collection.structure.get(selectedColumn);
-              if(columnModel.options.has('filter_type') && columnModel.options.get('filter_type') === "dropdown") {
-                //Get Related Column Collection
+              if (columnModel.options.has('filter_type') && columnModel.options.get('filter_type') === 'dropdown') {
+                // Get Related Column Collection
                 data.columnModel = columnModel;
                 data.relatedCollection = app.getEntries(columnModel.relationship.get('related_table'));
 
@@ -730,25 +734,27 @@ define([
                 name[app.statusMapping.status_name] = app.statusMapping.active_num;
                 data.relatedCollection.fetch({includeFilters: false, data: name});
                 that.listenTo(data.relatedCollection, 'sync', that.render);
-              } else{
+              } else {
                 data.filter_ui = that.getFilterDataType(selectedColumn);
               }
-            } else if(that.collection.structure.get(selectedColumn).get('type') === "ENUM") {
+            } else if (that.collection.structure.get(selectedColumn).get('type') === 'ENUM') {
               var columnModel = that.collection.structure.get(selectedColumn);
-              var vals = columnModel.get('column_type').substring(5, columnModel.get('column_type').length-1);
-              vals = vals.replace(/\'/g, "").split(',');
+              var vals = columnModel.get('column_type').substring(5, columnModel.get('column_type').length - 1);
+              vals = vals.replace(/\'/g, '').split(',');
               data.dropdownValues = vals;
-            } else if(that.collection.structure.get(selectedColumn).get('ui') === "many_to_many") {
+            } else if (that.collection.structure.get(selectedColumn).get('ui') === 'many_to_many') {
               data.filter_ui = that.getFilterDataType(selectedColumn);
-            }else if(that.collection.structure.get(selectedColumn).get('ui') === "multi_select") {
+            } else if (that.collection.structure.get(selectedColumn).get('ui') === 'multi_select') {
               var columnModel = that.collection.structure.get(selectedColumn);
               var keys = [];
-              for(var k in JSON.parse(columnModel.options.get('options'))) keys.push(k);
+              for (var k in JSON.parse(columnModel.options.get('options'))) {
+                keys.push(k);
+              }
               data.dropdownValues = keys;
             }
             data.filter_type = that.collection.structure.get(selectedColumn).get('type');
 
-            data.filterData = {id: filterColumn, type: filter[1].replace('%20',':'), value: filter[2].replace('%20',':').replace('%21',',')};
+            data.filterData = {id: filterColumn, type: filter[1].replace('%20', ':'), value: filter[2].replace('%20', ':').replace('%21', ',')};
 
             that.options.filters.push(data);
           }
@@ -759,7 +765,7 @@ define([
       this.render();
     },
 
-    initialize: function() {
+    initialize: function () {
       this.options.filters = [];
 
       if (this.options.syncFilters === false) {
