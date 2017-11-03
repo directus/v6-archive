@@ -1,18 +1,18 @@
-define(function(require, exports, module) {
+var entriesmodelcounter = 0;
 
+define(function (require, exports, module) {
   'use strict';
 
-  var app                     = require('app'),
-      _                       = require('underscore'),
-      Backbone                = require('backbone'),
-      ModelHelper             = require('helpers/model'),
-      EntriesJunctionCollection = require('core/entries/EntriesJunctionCollection'),
-      UIManager               = require('core/UIManager'),
-      Utils                   = require('utils'),
-      StatusMixin             = require('mixins/status'),
-      SaveItemMixin           = require('mixins/save-item'),
-      SchemaHelper            = require('helpers/schema'),
-      SchemaManager           = require('schema/SchemaManager');
+  var app = require('app'),
+    _ = require('underscore'),
+    Backbone = require('backbone'),
+    EntriesJunctionCollection = require('core/entries/EntriesJunctionCollection'),
+    UIManager = require('core/UIManager'),
+    Utils = require('utils'),
+    StatusMixin = require('mixins/status'),
+    SaveItemMixin = require('mixins/save-item'),
+    SchemaHelper = require('helpers/schema'),
+    SchemaManager = require('schema/SchemaManager');
 
   var EntriesModel = module.exports = Backbone.Model.extend({
 
@@ -28,7 +28,7 @@ define(function(require, exports, module) {
 
     parse: function (result, options) {
       this._lastFetchedResult = result;
-      //result = this.parseDate(result);
+      // result = this.parseDate(result);
       this._resetTracking();
 
       // if collection exists in options it means this model is part of a collection
@@ -56,7 +56,7 @@ define(function(require, exports, module) {
       if (options.flatten) {
         var relationshipType = column.getRelationshipType();
 
-        if ('MANYTOONE' === relationshipType && _.isObject(value) ) {
+        if (relationshipType === 'MANYTOONE' && _.isObject(value)) {
           value = value.get('id');
 
           if (value != null) {
@@ -125,8 +125,8 @@ define(function(require, exports, module) {
         }
 
         var mess = (!forceUIValidation && !skipSerializationIfNull && !allowNull && isNull) ?
-          'The field cannot be empty'
-          : UIManager.validate(this, columnName, value);
+          'The field cannot be empty' :
+          UIManager.validate(this, columnName, value);
 
         if (mess !== undefined) {
           errors.push({attr: columnName, message: mess});
@@ -145,7 +145,7 @@ define(function(require, exports, module) {
     },
 
     parseDate: function (attributes) {
-      if(!attributes) {
+      if (!attributes) {
         return;
       }
       _.each(this.getStructure().getColumnsByType('datetime'), function (column) {
@@ -156,7 +156,7 @@ define(function(require, exports, module) {
       return attributes;
     },
 
-    //@todo: this whole shebang should be cached in the collection
+    // @todo: this whole shebang should be cached in the collection
     parseRelational: function (attributes) {
       var structure = this.getStructure();
       var relationalColumns = structure.getRelationalColumns();
@@ -168,7 +168,7 @@ define(function(require, exports, module) {
         var id = column.id;
         var tableRelated = column.getRelated();
         var relationshipType = column.getRelationshipType();
-        //var value = attributes[id];
+        // var value = attributes[id];
         var hasData = attributes[id] !== undefined;
         var ui = structure.get(column).options;
 
@@ -186,24 +186,23 @@ define(function(require, exports, module) {
             var options = {
               table: SchemaManager.getTable(tableRelated),
               structure: SchemaManager.getColumns('tables', tableRelated),
-              parse:true,
+              parse: true,
               filters: {columns_visible: columns},
               privileges: SchemaManager.getPrivileges(tableRelated)
-              //preferences: app.preferences[column.get('related_table')],
+              // preferences: app.preferences[column.get('related_table')],
             };
-
 
             // make sure that the table exists
             // @todo move this to column schema?
             if (options.table === undefined) {
-              throw "Error! The related table '" + tableRelated + "' does not exist! Check your UI settings for the field '" + id + "' in the table '" + this.collection.table.id + "'";
+              throw 'Error! The related table \'' + tableRelated + '\' does not exist! Check your UI settings for the field \'' + id + '\' in the table \'' + this.collection.table.id + '\'';
             }
 
             // make sure that the visible columns exists
             // todo move this to ??
             var diff = _.difference(columns, options.structure.pluck('column_name'));
             if (diff.length > 0) {
-              throw "Error! The column(s) '" + diff.join(',') + "' does not exist in related table '" + options.table.id + "'. Check your UI settings";
+              throw 'Error! The column(s) \'' + diff.join(',') + '\' does not exist in related table \'' + options.table.id + '\'. Check your UI settings';
             }
 
             if (relationshipType === 'ONETOMANY') {
@@ -285,15 +284,15 @@ define(function(require, exports, module) {
         if (relationshipType) {
           attributes[id].parentAttribute = id;
         }
-
       }, this);
 
       return attributes;
     },
 
-    //@todo: This is maybe a hack. Can we make the patch better?
+    // @todo: This is maybe a hack. Can we make the patch better?
     diff: function (key, val, options) {
-      var attrs, column, changedAttrs = {};
+      var attrs, column,
+        changedAttrs = {};
       if (typeof key === 'object') {
         attrs = key;
         options = val;
@@ -314,9 +313,9 @@ define(function(require, exports, module) {
         if (this.get(key, {flatten: true}) !== val) {
           changedAttrs[key] = val;
         }
-      },this);
+      }, this);
 
-      //Always pass id
+      // Always pass id
       changedAttrs[this.idAttribute] = this.id;
 
       return changedAttrs;
@@ -354,10 +353,14 @@ define(function(require, exports, module) {
           }
 
           // omit if the user has not permission to edit the field
-          if (!this.canEdit(key)) return;
+          if (!this.canEdit(key)) {
+            return;
+          }
 
           // Some one-manys are not nested objects and will not need any special treatment
-          if (!_.isObject(value)) return;
+          if (!_.isObject(value)) {
+            return;
+          }
 
           // Check if it is a one-many and if it should be deleted!
           // NOTE: MANYTOONE are passed as object (attributes)
@@ -398,8 +401,8 @@ define(function(require, exports, module) {
     // returns true or false
     isMine: function () {
       var myId = app.user.id,
-          magicOwnerColumn = (this.collection != null) ? this.collection.table.get('user_create_column') : null,
-          magicOwnerId = this.get(magicOwnerColumn);
+        magicOwnerColumn = (this.collection != null) ? this.collection.table.get('user_create_column') : null,
+        magicOwnerId = this.get(magicOwnerColumn);
 
       // If magecownerid is model, grab the id instead
       if (magicOwnerId instanceof Backbone.Model) {
@@ -413,25 +416,25 @@ define(function(require, exports, module) {
     // bigedit = edit others
     // edit = edit your own
     canEdit: function (attribute) {
-      //@TODO: Actually Fix this Issue
+      // @TODO: Actually Fix this Issue
       if (!this.collection) {
         return true;
       }
 
-      var iAmTheOwner         = this.isMine(),
-          bigeditPermission   = this.collection.hasPermission('bigedit'),
-          editPermission      = this.collection.hasPermission('edit'),
-          columnIsBlacklisted = !_.isEmpty(attribute) && this.collection.isWriteBlacklisted(attribute),
-          isNew               = this.isNew();
+      var iAmTheOwner = this.isMine(),
+        bigeditPermission = this.collection.hasPermission('bigedit'),
+        editPermission = this.collection.hasPermission('edit'),
+        columnIsBlacklisted = !_.isEmpty(attribute) && this.collection.isWriteBlacklisted(attribute),
+        isNew = this.isNew();
 
       // Can't edit primary key
       if (attribute === this.idAttribute) {
         return false;
       }
 
-      return (isNew && !columnIsBlacklisted)
-          || (!iAmTheOwner && bigeditPermission&& !columnIsBlacklisted)
-          || (iAmTheOwner && editPermission && !columnIsBlacklisted);
+      return (isNew && !columnIsBlacklisted) ||
+          (!iAmTheOwner && bigeditPermission && !columnIsBlacklisted) ||
+          (iAmTheOwner && editPermission && !columnIsBlacklisted);
     },
 
     getWriteFieldBlacklist: function () {
@@ -452,16 +455,16 @@ define(function(require, exports, module) {
 
     canDelete: function () {
       var iAmTheOwner = this.isMine(),
-          canDelete = this.collection.hasPermission('delete'),
-          canBigdelete = this.collection.hasPermission('bigdelete');
+        canDelete = this.collection.hasPermission('delete'),
+        canBigdelete = this.collection.hasPermission('bigdelete');
 
       return (!iAmTheOwner && canBigdelete) || (iAmTheOwner && canDelete);
     },
 
     toJSON: function (options, noNest) {
       var attributes = _.clone(this.attributes),
-          isModel,
-          isCollection;
+        isModel,
+        isCollection;
 
       options = options || {};
 
@@ -486,8 +489,8 @@ define(function(require, exports, module) {
           if (isModel || isCollection) {
             value = value.toJSON(options);
 
-            //@todo keep an eye on why this wasn't serialized before
-            //if (_.isEmpty(value)) return;
+            // @todo keep an eye on why this wasn't serialized before
+            // if (_.isEmpty(value)) return;
 
             attributes[key] = value;
           }
@@ -514,7 +517,6 @@ define(function(require, exports, module) {
         table: this.table,
         privileges: this.privileges
       }, options));
-
     },
 
     getTable: function () {
@@ -574,9 +576,11 @@ define(function(require, exports, module) {
     // },
 
     initialize: function (data, options) {
-      this.on('invalid', function(model, errors) {
-        var details = _.map(errors, function(err) { return '<b>'+app.capitalize(err.attr)+':</b> '+err.message; }).join('</li><li>');
-        var error_id = (this.id)? this.id : 'New';
+      this.on('invalid', function (model, errors) {
+        var details = _.map(errors, function (err) {
+          return '<b>' + app.capitalize(err.attr) + ':</b> ' + err.message;
+        }).join('</li><li>');
+        var error_id = (this.id) ? this.id : 'New';
         details = app.capitalize(this.getTable().id) + ' (' + error_id + ')' + '<hr><ul><li>' + details + '</li></ul>';
         app.trigger('alert:error', 'There seems to be a problem...', details);
       });
@@ -646,7 +650,7 @@ define(function(require, exports, module) {
       var hasChanges = false;
 
       if (attr) {
-        hasChanges = !!changes[attr];
+        hasChanges = Boolean(changes[attr]);
       } else {
         hasChanges = !_.isEmpty(changes);
       }
@@ -683,7 +687,7 @@ define(function(require, exports, module) {
     },
 
     hasUnsavedAttributes: function () {
-      return !!this.unsavedAttributes();
+      return Boolean(this.unsavedAttributes());
     },
 
     unsavedChanges: function (options) {
@@ -780,7 +784,9 @@ define(function(require, exports, module) {
     set: function (key, val, options) {
       var attrs, ret;
 
-      if (key == null) return this;
+      if (key == null) {
+        return this;
+      }
       // Handle both `"key", value` and `{key: value}` -style arguments.
       if (typeof key === 'object') {
         attrs = key;
@@ -809,10 +815,11 @@ define(function(require, exports, module) {
             val = val.toJSON();
           }
 
-          if (_.isEqual(this._originalAttributes[key], val))
+          if (_.isEqual(this._originalAttributes[key], val)) {
             delete this._unsavedChanges[key];
-          else
+          } else {
             this._unsavedChanges[key] = val;
+          }
         }
         this._triggerUnsavedChanges();
       }
@@ -823,7 +830,7 @@ define(function(require, exports, module) {
     // we need to do this because initialize is called AFTER parse.
     constructor: function EntriesModel(data, options) {
       // inherit structure and table from collection if it exists
-      //@todo: it needs a fallback or throw an exception
+      // @todo: it needs a fallback or throw an exception
       // when options (collection) is not defined.
       options || (options = {});
 
@@ -831,9 +838,23 @@ define(function(require, exports, module) {
       this.table = options.collection ? options.collection.table : options.table;
       this.privileges = options.collection ? options.collection.privileges : options.privileges;
 
-      ModelHelper.setIdAttribute(this);
+      if (this instanceof Backbone.Collection) {
+        this.each(this.addPrimaryColumnToModel);
+      } else {
+        this.addPrimaryColumnToModel(this);
+      }
 
       EntriesModel.__super__.constructor.call(this, data, options);
+    },
+
+    addPrimaryColumnToModel: function (model) {
+      if (model.collection && model.collection.junctionStructure) {
+        model = model.collection.junctionStructure;
+      }
+
+      if (model.table && model.table.hasPrimaryColumn() && model.table.getPrimaryColumnName() !== 'id') {
+        model.idAttribute = model.table.getPrimaryColumnName();
+      }
     }
   });
 

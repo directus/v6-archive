@@ -5,15 +5,13 @@ define([
   'core/notification',
   'core/t',
   'helpers/table',
-  'helpers/model',
   'core/table/table.headview',
   'core/table/table.bodyview',
   'core/table/table.footerview',
   'plugins/jquery.flashrow'
 ],
 
-function(app, _, Backbone, Notification, __t, TableHelpers, ModelHelper, TableHead, TableBody, TableFooter) {
-
+function (app, _, Backbone, Notification, __t, TableHelpers, TableHead, TableBody, TableFooter) {
   'use strict';
 
   var TableView = Backbone.Layout.extend({
@@ -25,7 +23,7 @@ function(app, _, Backbone, Notification, __t, TableHelpers, ModelHelper, TableHe
 
     events: {
       // TODO: make those element to stop propagation to avoid this nesting
-      'click tbody td:not(.js-check):not(.relational-remove):not(.status):not(.js-sort)' : function (event) {
+      'click tbody td:not(.js-check):not(.relational-remove):not(.status):not(.js-sort)': function (event) {
         var id = $(event.currentTarget).closest('tr').data('id');
         if (!this.options.navigate) {
           return;
@@ -43,7 +41,7 @@ function(app, _, Backbone, Notification, __t, TableHelpers, ModelHelper, TableHe
 
     TableBody: TableBody,
 
-    serialize: function() {
+    serialize: function () {
       return {
         columns: this.options.columns,
         id: this.collection.table.id,
@@ -64,7 +62,7 @@ function(app, _, Backbone, Notification, __t, TableHelpers, ModelHelper, TableHe
       app.router.go(route);
     },
 
-    selection: function() {
+    selection: function () {
       var selection = [];
 
       this.$('td .js-select-row:checked').each(function () {
@@ -74,7 +72,7 @@ function(app, _, Backbone, Notification, __t, TableHelpers, ModelHelper, TableHe
       return selection;
     },
 
-    beforeRender: function() {
+    beforeRender: function () {
       var options = this.options;
 
       options.parentView = this;
@@ -121,7 +119,7 @@ function(app, _, Backbone, Notification, __t, TableHelpers, ModelHelper, TableHe
 
     bodyScrollTop: undefined,
 
-    flashItem: function(entryID, bodyScrollTop) {
+    flashItem: function (entryID, bodyScrollTop) {
       this.flashItemID = entryID;
       this.bodyScrollTop = parseInt(bodyScrollTop, 10) || 0;
     },
@@ -166,7 +164,7 @@ function(app, _, Backbone, Notification, __t, TableHelpers, ModelHelper, TableHe
       $(window).on('resize', _.debounce(onResize, 300));
     },
 
-    afterRender: function() {
+    afterRender: function () {
       this.bindTableEvents();
 
       if (this.bodyScrollTop) {
@@ -174,16 +172,16 @@ function(app, _, Backbone, Notification, __t, TableHelpers, ModelHelper, TableHe
       }
 
       this.bodyScrollTop = undefined;
-      app.on('load', function() {
-        if(this.flashItemID) {
+      app.on('load', function () {
+        if (this.flashItemID) {
           this.$el.find('tr[data-id="' + this.flashItemID + '"]').flashRow();
         }
         this.flashItemID = undefined;
       }, this);
     },
 
-    initializeDrop: function() {
-      //Cache a reference to the this.$el
+    initializeDrop: function () {
+      // Cache a reference to the this.$el
       var $el = this.$el;
       var collection = this.collection;
       var saveAfterDrop = this.saveAfterDrop;
@@ -194,20 +192,20 @@ function(app, _, Backbone, Notification, __t, TableHelpers, ModelHelper, TableHe
 
       // If collection supports dnd
       // Since dragenter sux, this is how we do...
-      $el.on('dragover', function(e) {
+      $el.on('dragover', function (e) {
         clearInterval(timer);
         e.stopPropagation();
         e.preventDefault();
         $el.addClass('dragover');
       });
 
-      $el.on('dragleave', function(e) {
+      $el.on('dragleave', function (e) {
+        clearInterval(timer);
+        timer = setInterval(function () {
+          $el.removeClass('dragover');
+          console.log('leave');
           clearInterval(timer);
-          timer = setInterval(function(){
-            $el.removeClass('dragover');
-            console.log('leave');
-            clearInterval(timer);
-          },50);
+        }, 50);
       });
 
       // Since data transfer is not supported by jquery...
@@ -224,7 +222,7 @@ function(app, _, Backbone, Notification, __t, TableHelpers, ModelHelper, TableHe
             // item[app.statusMapping.status_name] = app.statusMapping.active_num;
 
             if (saveAfterDrop) {
-              //@todo: update collection status count
+              // @todo: update collection status count
               collection.create(item);
             } else {
               collection.add(item, {nest: true, parse: true});
@@ -235,7 +233,7 @@ function(app, _, Backbone, Notification, __t, TableHelpers, ModelHelper, TableHe
       }, this);
     },
 
-    getTableColumns: function() {
+    getTableColumns: function () {
       var structure = this.collection.structure;
       var blacklist = this.options.blacklist || [];
       var whitelist = this.options.whitelist || [];
@@ -271,37 +269,37 @@ function(app, _, Backbone, Notification, __t, TableHelpers, ModelHelper, TableHe
       return this.options.system === true ? this.options.systemCollection : this.collection;
     },
 
-    toggleSortable: function() {
+    toggleSortable: function () {
       if (this.sortableWidget.options.sort) {
         this.disableSortable();
-        Notification.info(__t('table_sort_disabled'), '<i>'+__t('table_sort_disabled_message')+'</i>', {timeout: 3000});
+        Notification.info(__t('table_sort_disabled'), '<i>' + __t('table_sort_disabled_message') + '</i>', {timeout: 3000});
       } else {
         // hotfix: do not enable sort when there multiple pages
         if (this.collection.getTotalCount() > this.collection.rowsPerPage) {
-          Notification.warning(__t('table_sort_disabled'), '<i>'+__t('table_sort_multiple_pages_message')+'</i>', {timeout: 6000});
+          Notification.warning(__t('table_sort_disabled'), '<i>' + __t('table_sort_multiple_pages_message') + '</i>', {timeout: 6000});
           return;
         }
 
         this.enableSortable();
-        Notification.info(__t('table_sort_enabled'), '<i>'+__t('table_sort_enabled_message')+'</i>', {timeout: 3000});
+        Notification.info(__t('table_sort_enabled'), '<i>' + __t('table_sort_enabled_message') + '</i>', {timeout: 3000});
       }
     },
 
-    enableSortable: function() {
+    enableSortable: function () {
       this.$el.find('table').removeClass('disable-sorting').addClass('reorder-enabled');
       this.$('.js-sort-toggle').addClass('active');
       this.sortable = this.sortableWidget.options.sort = true;
       this.sortableWidget.options.disabled = false;
     },
 
-    disableSortable: function() {
+    disableSortable: function () {
       this.$el.find('table').addClass('disable-sorting').removeClass('reorder-enabled');
       this.$('.js-sort-toggle').removeClass('active');
       this.sortable = this.sortableWidget.options.sort = false;
       this.sortableWidget.options.disabled = true;
     },
 
-    setSpacing: function(name) {
+    setSpacing: function (name) {
       if (_.indexOf(app.config.get('spacings'), name) < 0) {
         return;
       }
@@ -330,7 +328,7 @@ function(app, _, Backbone, Notification, __t, TableHelpers, ModelHelper, TableHe
 
       if (options.system !== true) {
         this.listenTo(collection, 'sync', this.render);
-        this.listenTo(collection, 'visibility', function() {
+        this.listenTo(collection, 'visibility', function () {
           this.options.columns = this.getTableColumns();
           this.render();
         });
@@ -375,7 +373,7 @@ function(app, _, Backbone, Notification, __t, TableHelpers, ModelHelper, TableHe
         if (viewOptions) {
           try {
             viewOptions = JSON.parse(viewOptions);
-            viewOptions = viewOptions ? viewOptions['table'] : {};
+            viewOptions = viewOptions ? viewOptions.table : {};
           } catch (err) {
             viewOptions = {};
             this.state.malformedOptions = true;
@@ -384,11 +382,11 @@ function(app, _, Backbone, Notification, __t, TableHelpers, ModelHelper, TableHe
         }
 
         this.options.showItemNumbers = this.getViewOptions('item_numbers');
-        if (viewOptions && viewOptions['spacing']) {
-          this.state.spacing = viewOptions['spacing']
+        if (viewOptions && viewOptions.spacing) {
+          this.state.spacing = viewOptions.spacing;
         }
 
-        this.state.spacing = viewOptions ? (viewOptions['spacing'] || 'cozy') : 'cozy';
+        this.state.spacing = viewOptions ? (viewOptions.spacing || 'cozy') : 'cozy';
       }
 
       // ==================================================================================
@@ -403,7 +401,7 @@ function(app, _, Backbone, Notification, __t, TableHelpers, ModelHelper, TableHe
         this.sortable = false;
       }
 
-      this.saveAfterDrop = this.options.saveAfterDrop = (options.saveAfterDrop !== undefined) ?  options.saveAfterDrop : true;
+      this.saveAfterDrop = this.options.saveAfterDrop = (options.saveAfterDrop !== undefined) ? options.saveAfterDrop : true;
 
       if (this.options.droppable || collection.droppable) {
         this.initializeDrop();
