@@ -1,14 +1,17 @@
-define(function(require, exports, module) {
+/*
+  Individual interface rendered in an editView (probably)
+ */
 
+define(function (require, exports, module) {
   'use strict';
 
-  var app         = require('app');
-  var _           = require('underscore');
-  var Utils       = require('utils');
-  var StringHelper= require('helpers/string');
-  var Backbone    = require('backbone');
-  var Handlebars  = require('handlebars');
-  var UIManager   = require('./UIManager');
+  var app = require('app');
+  var _ = require('underscore');
+  var Utils = require('utils');
+  var StringHelper = require('helpers/string');
+  var Backbone = require('backbone');
+  var Handlebars = require('handlebars');
+  var UIManager = require('./UIManager');
 
   var UIContainer = Backbone.Layout.extend({
 
@@ -56,13 +59,13 @@ define(function(require, exports, module) {
         return;
       }
 
-      enabled = !!enabled;
+      enabled = Boolean(enabled);
 
       var $input = this.$('input[name=batch_edit_' + this.column.id + ']').first();
       this.$el.toggleClass(this.dom.BATCH_EDIT);
 
       $input.val(enabled ? 1 : 0);
-      this.state.batchEnabled = !!enabled;
+      this.state.batchEnabled = Boolean(enabled);
     },
 
     serialize: function () {
@@ -161,7 +164,7 @@ define(function(require, exports, module) {
         }
 
         if (isHidden) {
-          view.$el.css({'display':'none'});
+          view.$el.css({display: 'none'});
         }
 
         if (view.isRequired()) {
@@ -179,7 +182,7 @@ define(function(require, exports, module) {
           uiContainer.insertView('.interface', view);
           views[column.id] = uiContainer;
         } else {
-          this.insertView('.fields',view);
+          this.insertView('.fields', view);
         }
       }, this);
 
@@ -197,8 +200,8 @@ define(function(require, exports, module) {
             group = group.substring(group.indexOf(':') + 1);
           }
           var compileString = '<div class="section-header"><span class="big-label-text">' + title + '</span></div><div class="grouping-view"></div>';
-          self.insertView('.fields', new Backbone.Layout({attributes: {class:'gutter-bottom-big', id:'grouping_' + i}, template: Handlebars.compile(compileString)}));
-          group.split(',').forEach(function(subgroup) {
+          self.insertView('.fields', new Backbone.Layout({attributes: {class: 'gutter-bottom-big', id: 'grouping_' + i}, template: Handlebars.compile(compileString)}));
+          group.split(',').forEach(function (subgroup) {
             if (views[subgroup] !== undefined) {
               self.insertView('#grouping_' + i + ' div.grouping-view', views[subgroup]);
             }
@@ -206,7 +209,7 @@ define(function(require, exports, module) {
           i++;
         });
       } else {
-        this.insertView('.fields', new Backbone.Layout({attributes: {class:'gutter-bottom-big', id:'grouping_1'}}));
+        this.insertView('.fields', new Backbone.Layout({attributes: {class: 'gutter-bottom-big', id: 'grouping_1'}}));
         for (var key in views) {
           self.insertView('#grouping_1', views[key]);
         }
@@ -254,7 +257,7 @@ define(function(require, exports, module) {
     },
 
     // Focus on first input
-    afterRender: function() {
+    afterRender: function () {
       if (this.options.focusOnFirst !== false) {
         var $first = this.$el.find(':input:first:visible');
         $first.focus();
@@ -262,22 +265,21 @@ define(function(require, exports, module) {
       }
 
       // If this is a nested collection (to-Many) "Add" modal, preset & hide the parent foreign key.
-      if(this.options.collectionAdd && !_.isEmpty(this.options.parentField)) {
+      if (this.options.collectionAdd && !_.isEmpty(this.options.parentField)) {
         this.model.set(this.options.parentField.name, this.options.parentField.value);
         var $select = this.$el.find('[name=' + this.options.parentField.name + ']');
         $select.closest('fieldset').hide();
       }
-
     },
 
-    data: function() {
+    data: function () {
       var data = this.$el.serializeObject();
       var whiteListedData = _.pick(data, this.visibleFields);
-      if(this.model.getWriteFieldBlacklist) {
+      if (this.model.getWriteFieldBlacklist) {
         whiteListedData = _.omit(whiteListedData, this.model.getWriteFieldBlacklist());
       }
       // check if any of the listed data has multiple values, then serialize it to string
-      _.each(whiteListedData, function(value, key, obj) {
+      _.each(whiteListedData, function (value, key, obj) {
         if (_.isArray(value)) {
           obj[key] = value.join(',');
         }
@@ -286,10 +288,9 @@ define(function(require, exports, module) {
       return whiteListedData;
     },
 
-    initialize: function(options) {
-
+    initialize: function (options) {
       var structureHiddenFields,
-          optionsHiddenFields = options.hiddenFields || [];
+        optionsHiddenFields = options.hiddenFields || [];
 
       this.inModal = options.inModal || false;
       this.structure = options.structure || this.model.getStructure() || this.structure;
@@ -300,7 +301,9 @@ define(function(require, exports, module) {
 
       // Hide fields defined as hidden in the schema
       structureHiddenFields = this.structure.chain()
-        .filter(function(column) { return column.get('hidden_input'); })
+        .filter(function (column) {
+          return column.get('hidden_input');
+        })
         .pluck('id')
         .value();
 
@@ -311,20 +314,20 @@ define(function(require, exports, module) {
       this.forceVisibleFields = options.forceVisibleFields || [];
 
       // @todo rewrite this!
-      this.model.on('invalid', function(model, errors) {
-        //Get rid of all errors
+      this.model.on('invalid', function (model, errors) {
+        // Get rid of all errors
         this.$el.find('.error-color').remove();
         this.$el.find('.error').removeClass('error');
-        _.each(errors, function(item) {
+        _.each(errors, function (item) {
           var $fieldset = $('#edit_field_' + item.attr);
           $fieldset.addClass('error');
           if ($fieldset.find('.error-color').length < 1) {
-            $fieldset.append('<span class="error-color validation-error">'+item.message+'</span>');
+            $fieldset.append('<span class="error-color validation-error">' + item.message + '</span>');
           }
         });
       }, this);
 
-      this.model.once('sync', function(e) {
+      this.model.once('sync', function (e) {
         this.model.changed = {};
         this.render();
       }, this);
