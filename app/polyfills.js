@@ -1,10 +1,4 @@
 define(function () {
-  if (!String.prototype.trim) {
-    String.prototype.trim = function () {
-      return this.replace(/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g, '');
-    };
-  }
-
   if (!String.prototype.startsWith) {
     String.prototype.startsWith = function (suffix) {
       return this.indexOf(suffix, this.length - suffix.length) !== -1;
