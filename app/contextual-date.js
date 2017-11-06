@@ -15,7 +15,6 @@ define(function (require) {
   var moment = require('moment');
   var _ = require('underscore');
   var $ = require('jquery');
-  var interval = require('core/interval');
 
   // Interval time every n milliseconds
   // TODO: Only has to update every minute up to an hour. After an hour, it only
@@ -33,6 +32,13 @@ define(function (require) {
         $element.text(date.fromNow());
       }
     });
+  }
+
+  function interval(callback, wait) {
+    setTimeout(function () {
+      callback();
+      interval(callback, wait);
+    }, wait);
   }
 
   interval(updateTime, waitTime);
