@@ -1,4 +1,4 @@
-define(function(require, exports, module) {
+define(function (require, exports, module) {
   'use strict';
 
   var app = require('app');
@@ -10,19 +10,19 @@ define(function(require, exports, module) {
 
     inputs: {},
 
-    addInput: function(attr, input) {
+    addInput: function (attr, input) {
       this.inputs[attr] = input;
     },
 
-    getInput: function(attr) {
+    getInput: function (attr) {
       return this.inputs[attr];
     },
 
-    parse: function(data) {
+    parse: function (data) {
       return data.data;
     },
 
-    url: function() {
+    url: function () {
       var column = this.parent;
       var columnSchema = this.parent.collection;
 
@@ -30,16 +30,16 @@ define(function(require, exports, module) {
     },
 
     // When the time is right, this part need serious reconsideration
-    getStructure: function() {
+    getStructure: function () {
       return this.structure;
     },
 
-    getTable: function() {
+    getTable: function () {
       return this.parent.getTable();
     },
 
-    //@todo: This is code repetition. Almost identical to entries.model. Create a mixin?
-    validate: function(attributes, options) {
+    // @todo: This is code repetition. Almost identical to entries.model. Create a mixin?
+    validate: function (attributes, options) {
       var errors = [];
       var structure = this.getStructure();
 
@@ -50,7 +50,7 @@ define(function(require, exports, module) {
 
       // only validates attributes that are part of the schema
       attributes = _.pick(attributes, structure.pluck('id'));
-      _.each(attributes, function(value, key, list) {
+      _.each(attributes, function (value, key, list) {
         var column = structure.get(key);
 
         // Don't validate hidden fields
@@ -79,24 +79,28 @@ define(function(require, exports, module) {
         var uiSettings = UIManager.getSettings(column.get('ui'));
         var skipSerializationIfNull = uiSettings.skipSerializationIfNull;
         var mess = (!forceUIValidation && !skipSerializationIfNull && nullDisallowed && isNull) ?
-          'The field cannot be empty'
-          : UIManager.validate(this, key, value);
+          'The field cannot be empty' :
+          UIManager.validate(this, key, value);
 
         if (mess !== undefined) {
           errors.push({attr: key, message: mess});
         }
       }, this);
 
-      if (errors.length > 0) return errors;
+      if (errors.length > 0) {
+        return errors;
+      }
     },
 
-    initialize: function() {
-      this.on('invalid', function(model, errors) {
-        var details = _.map(errors, function(err) { return '<b>'+app.capitalize(err.attr)+':</b> '+err.message; }).join('</li><li>');
-        var error_id = (this.id)? this.id : 'New';
+    initialize: function () {
+      this.on('invalid', function (model, errors) {
+        var details = _.map(errors, function (err) {
+          return '<b>' + app.capitalize(err.attr) + ':</b> ' + err.message;
+        }).join('</li><li>');
+        var error_id = (this.id) ? this.id : 'New';
         details = app.capitalize(this.parent.get('column_name')) + ' (' + error_id + ')' + '<hr><ul><li>' + details + '</li></ul>';
         app.trigger('alert:error', 'There seems to be a problem...', details);
       });
-    },
+    }
   });
 });

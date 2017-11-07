@@ -1,13 +1,28 @@
-define([
-  'core/t',
-  'underscore',
-  'backbone'
-], function (__t, _, Backbone) {
+/**
+ * Schema Utilities
+ *
+ * TODO: Add an object that handle supported values by types
+ *
+ * NOTE: We should maybe move some of these into their respective models
+ *   instead of relying on an external utility object.
+ *
+ * NOTE: Some of these are somewhat unneccesary abstractions for abstractions
+ *   sake.
+ */
 
+define(function (require, exports, module) {
   'use strict';
 
+  var __t = require('core/t');
+  var _ = require('underscore');
+  var Backbone = require('backbone');
+  var UIManager = require('core/UIManager');
+
+  var SchemaUtil = {};
+
   // All types must be unique
-  var types = {
+  // NOTE: The first property is the default value
+  SchemaUtil.types = {
     DATE: {
       DATETIME: null,
       DATE: null
@@ -19,7 +34,6 @@ define([
       NUMERIC: {length: '10,2'}
     },
     INTEGER: {
-      // NOTE: set INT as default. first = default
       INT: {length: 11},
       TINYINT: {length: 1},
       SMALLINT: {length: 5},
@@ -33,60 +47,95 @@ define([
     }
   };
 
-  function getTypes(group) {
-    var typesGroup = types[group];
+  /**
+   * Returns array of type names of given group name
+   * @param  {String} group Datatype group
+   * @return {Array}        Array of datatype names
+   */
+  SchemaUtil.getTypes = function (group) {
+    return _.keys(this.types[group]);
+  };
 
-    if (group) {
-      typesGroup = _.keys(typesGroup);
-    }
-
-    return typesGroup;
-  }
-
-  function getTypesWithoutGroup() {
+  /**
+   * Get a list of datatypes without grouping
+   * @return {Object} All available datatypes
+   */
+  SchemaUtil.getTypesWithoutGroup = function () {
     var list = {};
 
-    _.each(types, function (type) {
+    _.each(this.types, function (type) {
       _.each(type, function (value, key) {
         list[key] = value;
       });
     });
 
     return list;
-  }
+  };
 
-  function getType(name) {
-    var types = getTypesWithoutGroup();
+  /**
+   * Get the info of a single datatype by name
+   * @param  {String} name Datatype name
+   * @return {Object}      Datatype info object
+   */
+  SchemaUtil.getType = function (name) {
+    var types = this.getTypesWithoutGroup();
 
     return _.find(types, function (value, key) {
-      if (key === name) {
-        return true;
-      }
+      return key === name;
     });
-  }
+  };
 
-  // @TODO: Add an object that handle supported values by types
-  var dateTypes = getTypes('DATE');
-  var decimalTypes = getTypes('DECIMAL');
-  var numericTypes = getTypes('INTEGER').concat(decimalTypes);
-  var stringTypes = getTypes('STRING');
+  /**
+   * Get array of all datatypes that support numeric values
+   * @return {Array} List of string datatype names
+   */
+  SchemaUtil.getNumericInterfaceTypes = function () {
+    // Numeric values can be saved in string based columns as well
+    var stringTypes = this.getTypes('STRING');
 
-  var getNumericInterfaceTypes = function () {
+    var decimalTypes = this.getTypes('DECIMAL');
+    var numericTypes = this.getTypes('INTEGER').concat(decimalTypes);
     return numericTypes.concat(stringTypes);
   };
 
-  var cleanIdentifier = function (identifier) {
+  /**
+   * Replace all non-alphanumeric characters with an underscore and convert
+   *   value to lowerCase
+   *
+   * f.e.: Table Name => table_name
+   *
+   * TODO: Move this to StringUtil
+   *
+   * @param  {String} identifier Name to convert eg Table Name
+   * @return {String}            Converted name  eg table_name
+   */
+  SchemaUtil.cleanIdentifier = function (identifier) {
     return (identifier || '').replace(/[^a-z0-9-_]+/ig, '_').toLowerCase();
   };
 
-  var cleanColumnName = function (name) {
-    return cleanIdentifier(name).replace(/^[0-9]+/ig, '').toLowerCase();
+  /**
+   * Remove numeric characters from string
+   *
+   * TODO: Move this to StringUtil
+   *
+   * @param  {String} name "Dirty" column name eg m4d h4cks
+   * @return {String}      Cleaned up column name md_hcks
+   */
+  SchemaUtil.cleanColumnName = function (name) {
+    return this.cleanIdentifier(name).replace(/^[0-9]+/ig, '').toLowerCase();
   };
 
-  var filterColumns = function (structure, type, excludeSystems) {
-    excludeSystems = excludeSystems === true;
+  /**
+   * Filter a collection of Schema ColumnModels
+   * @param  {Array} collection       Array of ColumnModels
+   * @param  {Array} type             Array of datatype names
+   * @param  {Boolean} excludeSystems Remove the system interfaces from the output
+   * @return {Array}                  Filtered collection
+   */
+  SchemaUtil.filterColumns = function (collection, type, excludeSystems) {
+    excludeSystems = Boolean(excludeSystems);
 
-    return structure.filter(function (model) {
+    return collection.filter(function (model) {
       var hasType = type.indexOf(model.get('type')) >= 0;
       var isSystem = model.get('system');
 
@@ -95,56 +144,110 @@ define([
       }
 
       return hasType;
-    })
+    });
   };
 
-  var getTypeDefaultLength = function (name) {
-    var type = getType(name);
-
+  /**
+   * Extract length value from a single datatype
+   * @param  {String} name Name of the datatype
+   * @return {String}      Default length value
+   */
+  SchemaUtil.getTypeDefaultLength = function (name) {
+    var type = this.getType(name);
     return type && type.length ? type.length : null;
   };
 
-  var dateColumns = function (structure, excludeSystems) {
-    return filterColumns(structure, dateTypes, excludeSystems);
+  /**
+   * Get all columns that support a date value from a given collection
+   * @param  {Array} collection       Array of ColumnModels
+   * @param  {Boolean} excludeSystems Remove the system interfaces from the output
+   * @return {Array}                  Filtered array of collections
+   */
+  SchemaUtil.dateColumns = function (collection, excludeSystems) {
+    var dateTypes = this.getTypes('DATE');
+    return this.filterColumns(collection, dateTypes, excludeSystems);
   };
 
-  var numericColumns = function (structure, excludeSystems) {
-    return filterColumns(structure, numericTypes, excludeSystems);
+  /**
+   * Get all columns that support a numeric value from a given collection
+   * @param  {Array} collection       Array of ColumnModels
+   * @param  {Boolean} excludeSystems Remove the system interfaces from the output
+   * @return {Array}                  Filtered array of collections
+   */
+  SchemaUtil.numericColumns = function (collection, excludeSystems) {
+    var numericTypes = this.getNumericInterfaceTypes();
+    return this.filterColumns(collection, numericTypes, excludeSystems);
   };
 
-  var primaryColumns = function (structure) {
-    return structure.filter(function (model) {
+  /**
+   * Filter collection of ColumnModels for primary keys
+   * @param  {Array} collection  ColumnCollection
+   * @return {Array}             Array of primary key columns
+   */
+  SchemaUtil.primaryColumns = function (collection) {
+    return collection.filter(function (model) {
       return model.get('key') === 'PRI';
     });
   };
 
-  var isStringType = function (type) {
+  /**
+   * Check if a given name is a string datatype
+   * @param  {String} type Datatype name
+   * @return {Boolean}     Is a string-type
+   */
+  SchemaUtil.isStringType = function (type) {
+    var stringTypes = this.getTypes('STRING');
     return stringTypes.indexOf(type) >= 0;
   };
 
-  var isNumericType = function (type) {
+  /**
+   * Check if a given name is a numeric datatype
+   * @param  {String} type Datatype name
+   * @return {Boolean}     Is a string-type
+   */
+  SchemaUtil.isNumericType = function (type) {
+    var decimalTypes = this.getTypes('DECIMAL');
+    var numericTypes = this.getTypes('INTEGER').concat(decimalTypes);
     return numericTypes.indexOf(type) >= 0;
   };
 
-  var isDecimalType = function (type) {
+  /**
+   * Check if a given name is a decimal datatype
+   * @param  {String} type Datatype name
+   * @return {Boolean}     Is a string-type
+   */
+  SchemaUtil.isDecimalType = function (type) {
+    var decimalTypes = this.getTypes('DECIMAL');
     return decimalTypes.indexOf(type) >= 0;
   };
 
-  var supportsLength = function (type) {
-    return isStringType(type) || isNumericType(type) || ['ENUM', 'SET'].indexOf(type) >= 0;
+  /**
+   * Check if passed datatype supports a length value
+   * @param  {String} type Datatype name
+   * @return {Boolean}     Supports length
+   */
+  SchemaUtil.supportsLength = function (type) {
+    return this.isStringType(type) || this.isNumericType(type) || ['ENUM', 'SET'].indexOf(type) >= 0;
   };
 
-  var isMissingRequiredOptions = function (column) {
-    var UIManager = require('core/UIManager');
-    var uiOptionsName = UIManager.getRequiredOptions(column.get('ui'));
+  /**
+   * Checks if all required options are set on a ColumnModel
+   * @param  {Object} column ColumnModel instance or regular object
+   * @return {Boolean}       Option is missing
+   */
+  SchemaUtil.isMissingRequiredOptions = function (column) {
+    var requiredOptions = UIManager.getRequiredOptions(column.get('ui'));
     var columnOptions = column.get('options');
     var missing = false;
 
-    _.each(uiOptionsName, function (optionName) {
-      // NOTE: After we merge the synced data with the existing model this trigger a render event
-      // because the model "changed" with the new synced values
-      // which make the columns options not a UIModel anymore but a plain object
+    _.each(requiredOptions, function (optionName) {
+      // NOTE: After we merge the synced data with the existing model a render event is triggered
+      //   because the model "changed" with the new synced values, the UIModel is
+      //   changed to a plain object. Therefor, this function can either get a UIModel instance
+      //   or a plain object.
+
       // TODO: Make the column options parsed to UIModel
+
       var option;
       if (columnOptions instanceof Backbone.Model) {
         option = columnOptions.get(optionName);
@@ -152,8 +255,8 @@ define([
         try {
           columnOptions = JSON.parse(columnOptions);
           option = _.result(columnOptions, optionName);
-        } catch (e) {
-          // bad json
+        } catch (err) {
+          // TODO: Handle error
         }
       }
 
@@ -165,51 +268,8 @@ define([
     return missing;
   };
 
-  var isSystem = function (uiId) {
-    var UIManager = require('core/UIManager');
+  // TODO: Remove this abstraction. Just use UIManager directly
+  SchemaUtil.isSystem = UIManager.isSystem;
 
-    // TODO: Compare against a column model
-    return UIManager.isSystem(uiId);
-  };
-
-  var getSystemDefaultComment = function (uiId) {
-    var comment = '';
-
-    uiId  = (uiId || '').toLowerCase();
-
-    if (!isSystem(uiId)) {
-      return comment;
-    }
-
-    switch (uiId) {
-      case 'primary_key':
-        comment = __t('system_primary_key_comment');
-        break;
-      case 'status':
-        comment = __t('system_status_comment');
-        break;
-      case 'sort':
-        comment = __t('system_sort_comment');
-        break;
-    }
-
-    return comment;
-  };
-
-  return {
-    getTypeDefaultLength: getTypeDefaultLength,
-    getSystemDefaultComment: getSystemDefaultComment,
-    isMissingRequiredOptions: isMissingRequiredOptions,
-    isSystem: isSystem,
-    getNumericInterfaceTypes: getNumericInterfaceTypes,
-    isNumericType: isNumericType,
-    isDecimalType: isDecimalType,
-    isStringType: isStringType,
-    dateColumns: dateColumns,
-    numericColumns: numericColumns,
-    primaryColumns: primaryColumns,
-    cleanColumnName: cleanColumnName,
-    supportsLength: supportsLength,
-    cleanTableName: cleanIdentifier
-  }
+  module.exports = SchemaUtil;
 });

@@ -316,7 +316,19 @@ define([
         data.emptyComment = false;
         if (!data.comment) {
           if (SchemaHelper.isSystem(data.ui)) {
-            data.comment = SchemaHelper.getSystemDefaultComment(data.ui);
+            switch (data.ui) {
+              case 'primary_key':
+                data.comment = __t('system_primary_key_comment');
+                break;
+              case 'status':
+                data.comment = __t('system_status_comment');
+                break;
+              case 'sort':
+                data.comment = __t('system_sort_comment');
+                break;
+              default:
+                data.comment = '';
+            }
           } else {
             data.comment = __t('add_comment');
           }
