@@ -5,7 +5,6 @@ define([
   'helpers/ui',
   'core/t'
 ], function (Backbone, _, Handlebars, UIHelper, __t) {
-
   var UIComponentsOptions = ['id'];
   var UIComponent = function (options) {
     _.extend(this, _.pick(UIComponentsOptions, options));
@@ -42,26 +41,38 @@ define([
     },
     // Returns String That should be used to represent this UI when being listed as part of a table
     // @param options : Object : Contains Options/Attributes for this UI (value, collection [TableCollection], model [EntriesModel], schema, settings)
-    list: function(options) {
+    list: function (options) {
       return options.value;
     },
     // Value used to sort the UI
-    sort: function(options) {
+    sort: function (options) {
       return options.value;
     },
     // compile a handlebars content
-    compileView: function(source, data) {
+    compileView: function (source, data) {
       var template = Handlebars.compile(source);
       data || (data = {});
 
       return template(data);
     },
-    isNumeric: function() {
+    isNumeric: function () {
       return this.id === 'numeric';
     },
-    supportsNumber: function() {
-      return _.some(this.dataTypes, function(type) {
-        return UIHelper.supportsNumeric(type);
+    supportsNumber: function () {
+      return _.some(this.dataTypes, function (type) {
+        return _.contains([
+          'BIGINT',
+          'BIT',
+          'DECIMAL',
+          'DOUBLE',
+          'FLOAT',
+          'INTEGER',
+          'INT',
+          'MEDIUMINT',
+          'NUMERIC',
+          'SMALLINT',
+          'TINYINT'
+        ], type);
       });
     }
   });

@@ -5,9 +5,8 @@ define([
   'core/UIComponent',
   'core/UIView',
   'moment',
-  'helpers/ui',
   'core/t'
-], function (app, _, UIComponent, UIView, moment, UIHelper, __t) {
+], function (app, _, UIComponent, UIView, moment, __t) {
   'use strict';
 
   function removeTimeFromFormat(format) {
@@ -41,7 +40,7 @@ define([
     supportsTime: function (type) {
       type = type || this.columnSchema.get('type');
 
-      return UIHelper.supportsTime(type);
+      return _.contains(['DATETIME', 'TIME', 'TIMESTAMP'], type);
     },
 
     makeNow: function () {
