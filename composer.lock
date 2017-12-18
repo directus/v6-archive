@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "399121808fd30bc391d59ed8e42d859c",
+    "content-hash": "2309a096969fba1f7a8af8c14114ebda",
     "packages": [
         {
             "name": "directus/collection",
@@ -47,16 +47,16 @@
         },
         {
             "name": "directus/database",
-            "version": "0.1.5",
+            "version": "0.1.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/directus/directus-database.git",
-                "reference": "54ed0a1f846f3caf20b4f0787ffa404bd7b02cb5"
+                "reference": "2511b770cf8f72028f2c9f29e767d6e72ddc19a9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/directus/directus-database/zipball/54ed0a1f846f3caf20b4f0787ffa404bd7b02cb5",
-                "reference": "54ed0a1f846f3caf20b4f0787ffa404bd7b02cb5",
+                "url": "https://api.github.com/repos/directus/directus-database/zipball/2511b770cf8f72028f2c9f29e767d6e72ddc19a9",
+                "reference": "2511b770cf8f72028f2c9f29e767d6e72ddc19a9",
                 "shasum": ""
             },
             "require": {
@@ -90,7 +90,7 @@
                 "database",
                 "directus"
             ],
-            "time": "2017-05-03T05:46:03+00:00"
+            "time": "2017-12-17T20:16:22+00:00"
         },
         {
             "name": "directus/migrations",
@@ -98,12 +98,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/WellingGuzman/Migrations.git",
-                "reference": "3f0f3a1eb7739b2d903dea8d53ca2d294edc654b"
+                "reference": "5a0a8843de5e57c7302f36146d261bed828e1454"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/WellingGuzman/Migrations/zipball/3f0f3a1eb7739b2d903dea8d53ca2d294edc654b",
-                "reference": "3f0f3a1eb7739b2d903dea8d53ca2d294edc654b",
+                "url": "https://api.github.com/repos/WellingGuzman/Migrations/zipball/5a0a8843de5e57c7302f36146d261bed828e1454",
+                "reference": "5a0a8843de5e57c7302f36146d261bed828e1454",
                 "shasum": ""
             },
             "require": {
@@ -141,7 +141,7 @@
             ],
             "description": "Framework for generating and managing database migrations",
             "homepage": "https://github.com/wellingguzman/migrations",
-            "time": "2016-07-28 18:37:42"
+            "time": "2017-09-15 17:34:21"
         },
         {
             "name": "directus/permissions",
@@ -149,12 +149,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/directus/directus-permissions.git",
-                "reference": "ede89b9221820c54e538780c73f82d5eb0dd2d3b"
+                "reference": "4616155b24fbfe219e29d16c1076527ff4707906"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/directus/directus-permissions/zipball/ede89b9221820c54e538780c73f82d5eb0dd2d3b",
-                "reference": "ede89b9221820c54e538780c73f82d5eb0dd2d3b",
+                "url": "https://api.github.com/repos/directus/directus-permissions/zipball/4616155b24fbfe219e29d16c1076527ff4707906",
+                "reference": "4616155b24fbfe219e29d16c1076527ff4707906",
                 "shasum": ""
             },
             "require": {
@@ -181,7 +181,7 @@
                 "directus",
                 "permissions"
             ],
-            "time": "2016-11-16 19:14:18"
+            "time": "2017-05-27 22:30:33"
         },
         {
             "name": "league/flysystem",
@@ -189,12 +189,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/thephpleague/flysystem.git",
-                "reference": "64ff28b9a736cda66bc0fcb80fbdd408a3515eee"
+                "reference": "f996962c617ddc71e79ab0f270ea966da796b20d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/thephpleague/flysystem/zipball/64ff28b9a736cda66bc0fcb80fbdd408a3515eee",
-                "reference": "64ff28b9a736cda66bc0fcb80fbdd408a3515eee",
+                "url": "https://api.github.com/repos/thephpleague/flysystem/zipball/f996962c617ddc71e79ab0f270ea966da796b20d",
+                "reference": "f996962c617ddc71e79ab0f270ea966da796b20d",
                 "shasum": ""
             },
             "require": {
@@ -205,12 +205,13 @@
             },
             "require-dev": {
                 "ext-fileinfo": "*",
-                "mockery/mockery": "~0.9",
-                "phpspec/phpspec": "^2.2",
-                "phpunit/phpunit": "~4.8"
+                "phpspec/phpspec": "^3.4",
+                "phpunit/phpunit": "^5.7"
             },
             "suggest": {
                 "ext-fileinfo": "Required for MimeType",
+                "ext-ftp": "Allows you to use FTP server storage",
+                "ext-openssl": "Allows you to use FTPS server storage",
                 "league/flysystem-aws-s3-v2": "Allows you to use S3 storage with AWS SDK v2",
                 "league/flysystem-aws-s3-v3": "Allows you to use S3 storage with AWS SDK v3",
                 "league/flysystem-azure": "Allows you to use Windows Azure Blob storage",
@@ -220,7 +221,8 @@
                 "league/flysystem-sftp": "Allows you to use SFTP server storage via phpseclib",
                 "league/flysystem-webdav": "Allows you to use WebDAV storage",
                 "league/flysystem-ziparchive": "Allows you to use ZipArchive adapter",
-                "spatie/flysystem-dropbox": "Allows you to use Dropbox storage"
+                "spatie/flysystem-dropbox": "Allows you to use Dropbox storage",
+                "srmklive/flysystem-dropbox-v2": "Allows you to use Dropbox storage for PHP 5 applications"
             },
             "type": "library",
             "extra": {
@@ -263,7 +265,7 @@
                 "sftp",
                 "storage"
             ],
-            "time": "2017-05-11 11:15:45"
+            "time": "2017-12-11 09:46:41"
         },
         {
             "name": "slim/extras",
@@ -360,12 +362,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/swiftmailer/swiftmailer.git",
-                "reference": "cd4ffa87f4902527b1725587d368062c28eb98c2"
+                "reference": "c1265670eec0664247d149072593ae309e8bf73e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/swiftmailer/swiftmailer/zipball/cd4ffa87f4902527b1725587d368062c28eb98c2",
-                "reference": "cd4ffa87f4902527b1725587d368062c28eb98c2",
+                "url": "https://api.github.com/repos/swiftmailer/swiftmailer/zipball/c1265670eec0664247d149072593ae309e8bf73e",
+                "reference": "c1265670eec0664247d149072593ae309e8bf73e",
                 "shasum": ""
             },
             "require": {
@@ -400,13 +402,13 @@
                 }
             ],
             "description": "Swiftmailer, free feature-rich PHP mailer",
-            "homepage": "http://swiftmailer.org",
+            "homepage": "https://swiftmailer.symfony.com",
             "keywords": [
                 "email",
                 "mail",
                 "mailer"
             ],
-            "time": "2017-05-01 15:54:38"
+            "time": "2017-11-23 14:49:16"
         },
         {
             "name": "twig/twig",
@@ -414,12 +416,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/twigphp/Twig.git",
-                "reference": "860f80178bda47f981d979505c5d0aa511baa033"
+                "reference": "b36e3eb45221b36e0bf8050c18231ee4209ee225"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/twigphp/Twig/zipball/860f80178bda47f981d979505c5d0aa511baa033",
-                "reference": "860f80178bda47f981d979505c5d0aa511baa033",
+                "url": "https://api.github.com/repos/twigphp/Twig/zipball/b36e3eb45221b36e0bf8050c18231ee4209ee225",
+                "reference": "b36e3eb45221b36e0bf8050c18231ee4209ee225",
                 "shasum": ""
             },
             "require": {
@@ -433,12 +435,15 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.34-dev"
+                    "dev-master": "1.35-dev"
                 }
             },
             "autoload": {
                 "psr-0": {
                     "Twig_": "lib/"
+                },
+                "psr-4": {
+                    "Twig\\": "src/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -468,7 +473,7 @@
             "keywords": [
                 "templating"
             ],
-            "time": "2017-05-12 13:54:14"
+            "time": "2017-12-07 15:56:46"
         },
         {
             "name": "zendframework/zend-db",
@@ -476,7 +481,7 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/wellingguzman/zend-db",
-                "reference": "38cd41381462eaacff6dccc0ec0597962b2be1d8"
+                "reference": "b22b09e61f88d03b770dd8d7c336407593f28443"
             },
             "require": {
                 "php": "^5.5 || ^7.0",
@@ -524,7 +529,7 @@
                 "db",
                 "zf2"
             ],
-            "time": "2017-01-20 19:34:42"
+            "time": "2017-12-08 16:35:06"
         },
         {
             "name": "zendframework/zend-stdlib",
@@ -636,16 +641,16 @@
         },
         {
             "name": "phpunit/php-file-iterator",
-            "version": "dev-master",
+            "version": "1.4.x-dev",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/php-file-iterator.git",
-                "reference": "3cc8f69b3028d0f96a9078e6295d86e9bf019be5"
+                "reference": "730b01bc3e867237eaac355e06a36b85dd93a8b4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/php-file-iterator/zipball/3cc8f69b3028d0f96a9078e6295d86e9bf019be5",
-                "reference": "3cc8f69b3028d0f96a9078e6295d86e9bf019be5",
+                "url": "https://api.github.com/repos/sebastianbergmann/php-file-iterator/zipball/730b01bc3e867237eaac355e06a36b85dd93a8b4",
+                "reference": "730b01bc3e867237eaac355e06a36b85dd93a8b4",
                 "shasum": ""
             },
             "require": {
@@ -679,7 +684,7 @@
                 "filesystem",
                 "iterator"
             ],
-            "time": "2016-10-03T07:40:28+00:00"
+            "time": "2017-11-27T13:52:08+00:00"
         },
         {
             "name": "phpunit/php-text-template",
@@ -957,12 +962,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/yaml.git",
-                "reference": "93ccdde79f4b079c7558da4656a3cb1c50c68e02"
+                "reference": "968ef42161e4bc04200119da473077f9e7015128"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/yaml/zipball/93ccdde79f4b079c7558da4656a3cb1c50c68e02",
-                "reference": "93ccdde79f4b079c7558da4656a3cb1c50c68e02",
+                "url": "https://api.github.com/repos/symfony/yaml/zipball/968ef42161e4bc04200119da473077f9e7015128",
+                "reference": "968ef42161e4bc04200119da473077f9e7015128",
                 "shasum": ""
             },
             "require": {
@@ -998,7 +1003,7 @@
             ],
             "description": "Symfony Yaml Component",
             "homepage": "https://symfony.com",
-            "time": "2017-05-01T14:31:55+00:00"
+            "time": "2017-11-29T09:33:18+00:00"
         }
     ],
     "aliases": [],
