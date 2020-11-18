@@ -1,0 +1,106 @@
+<%- include('partials/head.ejs'); %>
+
+<section class="top-rated">
+	<form class="sorting-options">
+		<fieldset>
+			<div>
+				<input id="status-open" type="radio" name="status" value="open" <% if (locals.status === 'open') { %>checked<% } %>>
+				<label for="status-open" title="Only show open requests">Open</label>
+				<input id="status-closed" type="radio" name="status" value="closed" <% if (locals.status === 'closed') { %>checked<% } %>>
+				<label for="status-closed" title="Only show closed requests">Closed</label>
+			</div>
+		</fieldset>
+		<fieldset>
+			<div>
+				<input id="sort-votes" type="radio" name="sort" value="votes" <% if (locals.sort === 'votes') { %>checked<% } %>>
+				<label for="sort-votes" title="Order by vote score">Votes</label>
+				<input id="sort-date" type="radio" name="sort" value="date" <% if (locals.sort === 'date') { %>checked<% } %>>
+				<label for="sort-date" title="Order by most recent activity">Date</label>
+			</div>
+		</fieldset>
+		<button type="submit" class="big blue">Search</button>
+	</form>
+	<div class="links">
+		<% if (!locals.loggedIn) { %>
+		<a href="/auth" class="big blue">Login with GitHub</a>
+		<% } %>
+
+		<% if (locals.loggedIn) { %>
+		<a href="/logout" title="Log out">
+			<%= locals.username %>
+			<svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path d="M10.072 4.8L8 6.872 5.928 4.8 4.8 5.928 6.872 8 4.8 10.072 5.928 11.2 8 9.128l2.072 2.072 1.128-1.128L9.128 8 11.2 5.928 10.072 4.8zM8 0C3.576 0 0 3.576 0 8c0 4.424 3.576 8 8 8 4.424 0 8-3.576 8-8 0-4.424-3.576-8-8-8zm0 14.4c-3.528 0-6.4-2.872-6.4-6.4 0-3.528 2.872-6.4 6.4-6.4 3.528 0 6.4 2.872 6.4 6.4 0 3.528-2.872 6.4-6.4 6.4z" fill-rule="nonzero" fill="#666"/></svg>
+		</a>
+		<a href="#suggest-feature" class="big blue">Suggest a Feature</a>
+		<% } %>
+	</div>
+	<% locals.requests.forEach((request, i) => { %>
+	<article class="<% if (request.score < 0) { %>negative <% } %><% if (request.userVoted === 1) { %>voted-up<% } %><% if (request.userVoted === -1) { %>voted-down<% } %>">
+		<aside>
+			<p class="votes-count" title="#<%= i + 1 %> - Total Vote Score: <%= request.score %>">
+				<a href="/r/<%= request.id %>">
+					<%= request.score %>
+				</a>
+			</p>
+			<% if (locals.loggedIn) { %>
+			<div class="vote-buttons">
+				<form method="post" action="/vote">
+					<input type="hidden" name="request_id" value="<%= request.id %>">
+					<input type="hidden" name="action" value="plus">
+					<button class="vote-up" type="submit" title="Upvote this request">
+						<svg width="22" height="20" viewBox="0 0 22 20" xmlns="http://www.w3.org/2000/svg"><path d="M0 20h4V8H0v12zM22 9c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L13.17 0 6.59 6.59C6.22 6.95 6 7.45 6 8v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73V9.09l-.01-.01L22 9z" fill-rule="nonzero" /></svg>
+					</button>
+				</form>
+				<form method="post" action="/vote">
+					<input type="hidden" name="request_id" value="<%= request.id %>">
+					<input type="hidden" name="action" value="minus">
+					<button class="vote-down" type="submit" title="Downvote this request">
+						<svg width="22" height="20" viewBox="0 0 22 20" xmlns="http://www.w3.org/2000/svg"><path d="M14 0H5c-.83 0-1.54.5-1.84 1.22L.14 8.27C.05 8.5 0 8.74 0 9v1.91l.01.01L0 11c0 1.1.9 2 2 2h6.31l-.95 4.57-.03.32c0 .41.17.79.44 1.06L8.83 20l6.59-6.59c.36-.36.58-.86.58-1.41V2c0-1.1-.9-2-2-2zm4 0v12h4V0h-4z" fill-rule="nonzero" /></svg>
+					</button>
+				</form>
+			</div>
+			<% } else { %>
+			<div class="vote-buttons">
+				<a href="/auth" title="Upvote this request">
+					<svg width="22" height="20" viewBox="0 0 22 20" xmlns="http://www.w3.org/2000/svg">
+						<path d="M0 20h4V8H0v12zM22 9c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L13.17 0 6.59 6.59C6.22 6.95 6 7.45 6 8v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73V9.09l-.01-.01L22 9z" fill-rule="nonzero" />
+					</svg>
+				</a>
+				<a href="/auth" title="Downvote this request">
+					<svg width="22" height="20" viewBox="0 0 22 20" xmlns="http://www.w3.org/2000/svg">
+						<path d="M14 0H5c-.83 0-1.54.5-1.84 1.22L.14 8.27C.05 8.5 0 8.74 0 9v1.91l.01.01L0 11c0 1.1.9 2 2 2h6.31l-.95 4.57-.03.32c0 .41.17.79.44 1.06L8.83 20l6.59-6.59c.36-.36.58-.86.58-1.41V2c0-1.1-.9-2-2-2zm4 0v12h4V0h-4z" fill-rule="nonzero" />
+					</svg>
+				</a>
+			</div>
+			<% } %>
+		</aside>
+		<div>
+			<a href="/r/<%= request.id %>" title="<%= request.title %>"><h2><%= request.title %></h2></a>
+			<% if (locals.sort === 'date') { %>
+				<footer>Last commented on <time datetime="<%= request.comments[request.comments.length - 1].date %>" title="<%= request.comments[request.comments.length - 1].date %>"><%= request.comments[request.comments.length - 1].dateRelative %></time> by <a title="View <%= request.comments[request.comments.length - 1].username %> on GitHub" href="https://github.com/<%= request.comments[request.comments.length - 1].username %>"><%= request.comments[request.comments.length - 1].username %></a></footer>
+			<% } else { %>
+				<footer>Created <time datetime="<%= request.date %>" title="<%= request.date %>"><%= request.dateRelative %></time> by <a title="View <%= request.username %> on GitHub" href="https://github.com/<%= request.username %>"><%= request.username %></a></footer>
+			<% } %>
+		</div>
+		<% if (request.comments.length > 0) { %>
+		<a class="comments-link" href="/r/<%= request.id %>">
+			<%= request.comments.length %>
+			<svg width="20" height="20" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M18 0H2C.9 0 0 .9 0 2v18l4-4h14c1.1 0 2-.9 2-2V2c0-1.1-.9-2-2-2z" /></svg>
+		</a>
+		<% } %>
+	</article>
+	<% }) %>
+</section>
+
+<% if (locals.loggedIn) { %>
+<div class="modal" id="suggest-feature">
+	<form method="post" action="/r/new">
+		<label for="title">Title</label>
+		<input placeholder="Your request" id="title" type="text" name="title">
+
+		<label for="content">Description</label>
+		<textarea rows="5" id="content" name="content" placeholder="Please explain why this enhancement is the best idea ever"></textarea>
+		<button class="big blue" type="submit">Submit new request</button>
+	</form>
+</div>
+<div class="overlay-bg"></div>
+<% } %>

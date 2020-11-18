@@ -1,0 +1,54 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title><%= locals.title ? locals.title + ' |' : null %> Directus Feature Request</title>
+<link href="/style.css?v=1.0.6" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,100,300,500,700" type="text/css">
+
+<meta name="description" content="<%= locals.description ? locals.description : 'Request new Directus features or vote on existing submissions' %>">
+<meta name="keywords" content="Headless CMS, Decoupled, Content Management System, Open Source, Free, Directus, API, SDK, SQL, MySQL, DB GUI, DBaaS, Custom Database, Schema, RANGER Studio, Framework, Website, Native App, Content Delivery, Hosted">
+<meta name="author" content="Directus">
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="mobile-web-app-capable" content="yes">
+
+<meta property="og:title" content="<%= locals.title ? locals.title + ' |' : null %> Directus Feature Request"/>
+<meta property="og:image" content="https://request.getdirectus.com/directus-logo-800-sq-dark.png"/>
+<meta property="og:site_name" content="Directus"/>
+<meta property="og:description" content="<%= locals.description ? locals.description : 'Request new Directus features or vote on existing submissions' %>"/>
+
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="@directus" />
+<meta name="twitter:title" content="<%= locals.title ? locals.title + ' |' : null %> Directus Feature Request" />
+<meta name="twitter:description" content="<%= locals.description ? locals.description : 'Request new Directus features or vote on existing submissions' %>" />
+<meta name="twitter:image" content="https://request.getdirectus.com/directus-logo-800-sq-dark.png" />
+<meta name="twitter:url" content="https://request.getdirectus.com/" />
+
+<link rel="apple-touch-icon" sizes="57x57" href="/icons/apple-icon-57x57.png">
+<link rel="apple-touch-icon" sizes="60x60" href="/icons/apple-icon-60x60.png">
+<link rel="apple-touch-icon" sizes="72x72" href="/icons/apple-icon-72x72.png">
+<link rel="apple-touch-icon" sizes="76x76" href="/icons/apple-icon-76x76.png">
+<link rel="apple-touch-icon" sizes="114x114" href="/icons/apple-icon-114x114.png">
+<link rel="apple-touch-icon" sizes="120x120" href="/icons/apple-icon-120x120.png">
+<link rel="apple-touch-icon" sizes="144x144" href="/icons/apple-icon-144x144.png">
+<link rel="apple-touch-icon" sizes="152x152" href="/icons/apple-icon-152x152.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-icon-180x180.png">
+<link rel="icon" type="image/png" sizes="192x192"  href="/icons/android-icon-192x192.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="96x96" href="/icons/favicon-96x96.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png">
+<link rel="manifest" href="/icons/manifest.json">
+<meta name="msapplication-TileColor" content="#ffffff">
+<meta name="msapplication-TileImage" content="/icons/ms-icon-144x144.png">
+<meta name="theme-color" content="#ffffff">
+<script src="/script.js?v=1.0.6" defer></script>
+<header>
+	<svg viewBox="0 0 151 92" width="151" height="92" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd" stroke-linejoin="round" stroke-miterlimit="1.414">
+		<title>Directus</title>
+		<path d="M120.252 58.295l-.01-.003c-.68-.177-1.28-.362-1.77-.57-.512-.213-.916-.506-1.248-.86l.014-.088c.37-2.948.015-5.597.315-8.573 1.174-11.656 8.464-7.975 15.04-9.82 4.086-1.14 8.177-3.493 9.19-8.346-4.47-5.242-9.512-9.854-14.994-13.77-17.8-12.724-41.08-17.776-62.213-14.3 7.69 13.496 24.233 19.642 39.072 13.972-12.273 6.95-27.264 4.886-37.21-4.195-1.428.592-2.837 1.22-4.222 1.89 11.206 10.757 28.812 11.955 41.432 2.305-.06.098-1.125 1.78-2.5 8.78-2.926 14.876-11.42 13.71-21.877 9.952-21.763-7.83-33.775-.522-44.647-15.5-3.17 1.775-5.124 5.13-5.103 8.76.02 3.726 2.093 6.934 5.042 8.617 3.95-2.77 8.47-4.487 13.15-5.077-9.035 2.766-12.856 6.994-14.768 13.045-2.302 7.288-1.307 14.78-12.076 16.756-5.726.3-5.614 4.13-7.64 9.91-2.617 7.486-6.028 10.457-12.758 17.56 2.74 3.324 5.64 3.77 8.58 2.536 6.04-2.53 10.69-10.34 15.097-15.438 4.882-5.65 16.623-3.232 25.53-8.744 6.088-3.765 9.112-8.788 5.082-17.417 2.614 2.854 4.15 6.527 4.36 10.388C69.35 58.737 83.093 71.22 95.588 73.33c-.002 0-.003 0-.004-.003-1.286-1.6-2.31-3.343-3.06-5.142-1.455-3.485-1.89-6.633-1.587-9.363 1.16 6.87 8.078 15.68 19.185 16.498 2.83.21 5.907-.107 9.185-1.095 3.87-1.166 7.404-2.63 11.7-1.852 3.18.578 6.08 2.17 7.926 4.894 2.746 4.06 8.836 4.92 11.536-.05-6.233-16.04-23.04-17.052-30.22-18.922" />
+	</svg>
+	<% if (locals.showTitle) { %>
+		<h1>Request new Directus features or vote on existing submissions</h1>
+	<% } %>
+</header>
+<div class="loading-blocker"></div>

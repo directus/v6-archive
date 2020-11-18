@@ -1,0 +1,64 @@
+{
+  "name": "voting-tool",
+  "private": true,
+  "version": "1.0.6",
+  "description": "A simple tool for accepting community submissions (eg: feature requests) that can be voted into a priority ranking",
+  "main": "app/index.js",
+  "dependencies": {
+    "body-parser": "^1.18.0",
+    "compression": "^1.7.0",
+    "directus-sdk-javascript": "^2.1.0",
+    "dotenv": "^4.0.0",
+    "ejs": "^2.5.7",
+    "express": "^4.15.4",
+    "express-session": "^1.15.5",
+    "express-session-level": "^1.0.0",
+    "level": "^1.7.0",
+    "marked": "^0.3.6",
+    "passport": "^0.4.0",
+    "passport-github2": "^0.1.10",
+    "timeago.js": "^3.0.2"
+  },
+  "devDependencies": {
+    "eslint": "^4.8.0",
+    "nodemon": "^1.12.0",
+    "stylelint": "^8.1.1",
+    "stylelint-config-idiomatic-order": "^5.0.0"
+  },
+  "scripts": {
+    "dev": "nodemon app",
+    "start": "NODE_ENV=production node app"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/directus/voting-tool.git"
+  },
+  "author": "Rijk van Zanten <rijk@rngr.org>",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/directus/voting-tool/issues"
+  },
+  "homepage": "https://github.com/directus/voting-tool#readme",
+  "stylelint": {
+    "extends": "stylelint-config-idiomatic-order",
+    "rules": {
+      "indentation": "tab"
+    }
+  },
+  "eslintConfig": {
+    "env": {
+      "node": true,
+      "browser": true
+    },
+    "extends": [
+      "eslint:recommended"
+    ],
+    "parserOptions": {
+      "ecmaVersion": 6
+    },
+    "rules": {
+      "quotes": [1, "single"],
+      "semi": [1, "always"]
+    }
+  }
+}

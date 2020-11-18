@@ -1,0 +1,134 @@
+<%- include('partials/head.ejs'); %>
+<% if (editMode) { %>
+<a class="back" href="/r/<%= request.id %>">
+	<svg xmlns="http://www.w3.org/2000/svg" height="16" viewBox="0 0 24 24" width="16" fill="#fff">
+		<path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+		<path d="M0 0h24v24H0z" fill="none"/>
+	</svg>
+	Cancel
+</a>
+<% } else { %>
+<a class="back" href="/">
+	<svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+		<path d="M16 7H3.83l5.59-5.59L8 0 0 8l8 8 1.41-1.41L3.83 9H16" fill-rule="nonzero" fill="#FFF"/>
+	</svg>
+	Back to Listing
+</a>
+<% } %>
+<article class="single <% if (request.score < 0) { %>negative <% } %><% if (request.userVoted === 1) { %>voted-up<% } %><% if (request.userVoted === -1) { %>voted-down<% } %>">
+	<div class="single-title">
+		<aside>
+			<p class="votes-count" title="Total Vote Score: <%= request.score %>"><%= request.score %></p>
+			<% if (locals.username) { %>
+			<div class="vote-buttons">
+				<form method="post" action="/vote">
+					<input type="hidden" name="request_id" value="<%= request.id %>">
+					<input type="hidden" name="action" value="plus">
+					<button class="vote-up" type="submit" title="Upvote this feature">
+						<svg width="22" height="20" viewBox="0 0 22 20" xmlns="http://www.w3.org/2000/svg"><path d="M0 20h4V8H0v12zM22 9c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L13.17 0 6.59 6.59C6.22 6.95 6 7.45 6 8v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73V9.09l-.01-.01L22 9z" fill-rule="nonzero" /></svg>
+					</button>
+				</form>
+				<form method="post" action="/vote">
+					<input type="hidden" name="request_id" value="<%= request.id %>">
+					<input type="hidden" name="action" value="minus">
+					<button class="vote-down" type="submit" title="Downvote this feature">
+						<svg width="22" height="20" viewBox="0 0 22 20" xmlns="http://www.w3.org/2000/svg"><path d="M14 0H5c-.83 0-1.54.5-1.84 1.22L.14 8.27C.05 8.5 0 8.74 0 9v1.91l.01.01L0 11c0 1.1.9 2 2 2h6.31l-.95 4.57-.03.32c0 .41.17.79.44 1.06L8.83 20l6.59-6.59c.36-.36.58-.86.58-1.41V2c0-1.1-.9-2-2-2zm4 0v12h4V0h-4z" fill-rule="nonzero" /></svg>
+					</button>
+				</form>
+			</div>
+			<% } else { %>
+			<div class="vote-buttons">
+				<a href="/auth" title="Upvote this feature">
+					<svg width="22" height="20" viewBox="0 0 22 20" xmlns="http://www.w3.org/2000/svg">
+						<path d="M0 20h4V8H0v12zM22 9c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L13.17 0 6.59 6.59C6.22 6.95 6 7.45 6 8v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73V9.09l-.01-.01L22 9z" fill-rule="nonzero" />
+					</svg>
+				</a>
+				<a href="/auth" title="Downvote this feature">
+					<svg width="22" height="20" viewBox="0 0 22 20" xmlns="http://www.w3.org/2000/svg">
+						<path d="M14 0H5c-.83 0-1.54.5-1.84 1.22L.14 8.27C.05 8.5 0 8.74 0 9v1.91l.01.01L0 11c0 1.1.9 2 2 2h6.31l-.95 4.57-.03.32c0 .41.17.79.44 1.06L8.83 20l6.59-6.59c.36-.36.58-.86.58-1.41V2c0-1.1-.9-2-2-2zm4 0v12h4V0h-4z" fill-rule="nonzero" />
+					</svg>
+				</a>
+			</div>
+			<% } %>
+		</aside>
+		<div>
+			<% if (editMode && request.editAllowed) { %>
+			<form method="post" action="/r/<%= request.id %>">
+				<label for="title">Title</label>
+				<input type="text" id="title" name="title" value="<%= request.title %>">
+				<button type="submit">
+					<svg width="18" height="14" viewBox="0 0 18 14" xmlns="http://www.w3.org/2000/svg"><path d="M5.59 10.58L1.42 6.41 0 7.82l5.59 5.59 12-12L16.18 0" fill-rule="nonzero" fill="#3498DB"/></svg>
+				</button>
+			</form>
+			<% } else { %>
+				<h1><%= request.title %></h1>
+			<% } %>
+			<footer>
+				Created
+				<time datetime="<%= request.date %>" title="<%= request.date %>">
+					<%= request.dateRelative %>
+				</time>
+				by
+				<a href="https://github.com/<%= request.username %>" title="View <%= request.username %> on GitHub">
+					<%= request.username %>
+				</a>
+				<% if (editMode === false && request.editAllowed) { %> &bull; <a href="?edit=1">edit</a><% } %>
+			</footer>
+		</div>
+	</div>
+	<section class="comments">
+		<% request.comments.forEach(comment => { %>
+		<article>
+			<aside>
+				<a href="https://github.com/<%= comment.username %>">
+					<img class="<% if (comment.userVote) { %><%= comment.userVote %><% } %>" src="https://github.com/<%= comment.username %>.png?size=60" alt="<%= comment.username %>">
+					<% if (comment.userIsAdmin) { %>
+					<div class="placard">
+						Admin
+					</div>
+					<% } %>
+				</a>
+			</aside>
+			<main <% if (editMode && comment.editAllowed) { %>class="write-comment"<% } %>>
+			<% if (editMode && comment.editAllowed) { %>
+				<form method="post" action="/comment" class="edit">
+					<input type="hidden" name="comment_id" value="<%= comment.id %>">
+					<input type="hidden" name="request_id" value="<%= request.id %>">
+					<textarea name="content"><%= comment.content %></textarea>
+					<button type="submit">
+						<svg width="18" height="14" viewBox="0 0 18 14" xmlns="http://www.w3.org/2000/svg"><path d="M5.59 10.58L1.42 6.41 0 7.82l5.59 5.59 12-12L16.18 0" fill-rule="nonzero" fill="#3498DB"/></svg>
+					</button>
+				</form>
+			<% } else { %>
+				<div>
+				<%- comment.contentParsed %>
+				</div>
+			<% } %>
+			</main>
+			<footer>
+				<% if (comment.userVote) { %><%= comment.userVote %> &bull;<% } %>
+				<time datetime="<%= comment.date %>"><%= comment.dateRelative %></time> &bull;
+				<a href="https://github.com/<%= comment.username %>"><%= comment.username %></a>
+				<% if (comment.edited) { %>&bull; edited<% } %>
+				<% if (comment.editAllowed && editMode === false) { %> &bull; <a href="?edit=1">edit</a><% } %>
+			</footer>
+		</article>
+		<% }) %>
+		<% if (username && !editMode) { %>
+		<article>
+			<aside>
+				<img src="https://github.com/<%= username %>.png?size=60" alt="<%= username %>">
+			</aside>
+			<main class="write-comment">
+				<form method="post" action="/comment">
+					<input type="hidden" name="request_id" value="<%= request.id %>">
+					<textarea rows="1" placeholder="Add a comment here..." name="content"></textarea>
+					<button type="submit">
+						<svg height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" fill="white"/><path d="M0 0h24v24H0z" fill="none"/></svg>
+					</button>
+				</form>
+			</main>
+		</article>
+		<% } %>
+	</section>
+</article>
