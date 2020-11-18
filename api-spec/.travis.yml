@@ -1,0 +1,12 @@
+sudo: required
+
+language: ruby
+
+services:
+  - docker
+
+script:
+  - docker build -t sdkbuilds .
+  - docker run --name directussdks -d sdkbuilds /bin/bash
+  - docker cp directussdks:/sdks sdks
+  - docker rm directussdks

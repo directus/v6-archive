@@ -1,0 +1,212 @@
+diff --git a/modules/swagger-codegen/src/main/java/io/swagger/codegen/DefaultGenerator.java b/modules/swagger-codegen/src/main/java/io/swagger/codegen/DefaultGenerator.java
+index 80033e1..4cf2733 100644
+--- a/modules/swagger-codegen/src/main/java/io/swagger/codegen/DefaultGenerator.java
++++ b/modules/swagger-codegen/src/main/java/io/swagger/codegen/DefaultGenerator.java
+@@ -36,6 +36,7 @@ public class DefaultGenerator extends AbstractGenerator implements Generator {
+     private String basePath;
+     private String basePathWithoutHost;
+     private String contextPath;
++    private String myHostName;
+
+     @Override
+     public Generator opts(ClientOptInput opts) {
+@@ -73,6 +74,7 @@ public class DefaultGenerator extends AbstractGenerator implements Generator {
+     }
+
+     private String getHost() {
++        myHostName = swagger.getHost();
+         StringBuilder hostBuilder = new StringBuilder();
+         hostBuilder.append(getScheme());
+         hostBuilder.append("://");
+@@ -143,6 +145,7 @@ public class DefaultGenerator extends AbstractGenerator implements Generator {
+         contextPath = config.escapeText(swagger.getBasePath() == null ? "" : swagger.getBasePath());
+         basePath = config.escapeText(getHost());
+         basePathWithoutHost = config.escapeText(swagger.getBasePath());
++        myHostName = config.escapeText(swagger.getHost());
+
+     }
+
+@@ -413,6 +416,7 @@ public class DefaultGenerator extends AbstractGenerator implements Generator {
+                 Map<String, Object> operation = processOperations(config, tag, ops, allModels);
+
+                 operation.put("basePath", basePath);
++                operation.put("myHostName", myHostName);
+                 operation.put("basePathWithoutHost", basePathWithoutHost);
+                 operation.put("contextPath", contextPath);
+                 operation.put("baseName", tag);
+@@ -650,6 +654,7 @@ public class DefaultGenerator extends AbstractGenerator implements Generator {
+
+         bundle.put("swagger", this.swagger);
+         bundle.put("basePath", basePath);
++        bundle.put("myHostName", myHostName);
+         bundle.put("basePathWithoutHost", basePathWithoutHost);
+         bundle.put("scheme", getScheme());
+         bundle.put("contextPath", contextPath);
+diff --git a/modules/swagger-codegen/src/main/resources/Java/README.mustache b/modules/swagger-codegen/src/main/resources/Java/README.mustache
+index fff0bf0..396d0df 100644
+--- a/modules/swagger-codegen/src/main/resources/Java/README.mustache
++++ b/modules/swagger-codegen/src/main/resources/Java/README.mustache
+@@ -86,6 +86,8 @@ public class {{{classname}}}Example {
+         {{/authMethods}}
+         {{/hasAuthMethods}}
+
++        defaultClient.setBasePath("{{basePath}}");
++
+         {{{classname}}} apiInstance = new {{{classname}}}();
+         {{#allParams}}
+         {{{dataType}}} {{{paramName}}} = {{{example}}}; // {{{dataType}}} | {{{description}}}
+diff --git a/modules/swagger-codegen/src/main/resources/csharp/README.mustache b/modules/swagger-codegen/src/main/resources/csharp/README.mustache
+index 80e2437..1979b05 100644
+--- a/modules/swagger-codegen/src/main/resources/csharp/README.mustache
++++ b/modules/swagger-codegen/src/main/resources/csharp/README.mustache
+@@ -121,8 +121,9 @@ namespace Example
+             Configuration.Default.AccessToken = "YOUR_ACCESS_TOKEN";
+             {{/isOAuth}}
+             {{/authMethods}}
+-
+             {{/hasAuthMethods}}
++            Configuration.Default.BasePath = "{{basePath}}";
++
+             var apiInstance = new {{classname}}();
+             {{#allParams}}
+             {{#isPrimitiveType}}
+@@ -154,7 +155,7 @@ namespace Example
+ <a name="documentation-for-api-endpoints"></a>
+ ## Documentation for API Endpoints
+
+-All URIs are relative to *{{{basePath}}}*
++All URIs are relative to your configured base path, as per example.
+
+ Class | Method | HTTP request | Description
+ ------------ | ------------- | ------------- | -------------
+diff --git a/modules/swagger-codegen/src/main/resources/csharp/api_doc.mustache b/modules/swagger-codegen/src/main/resources/csharp/api_doc.mustache
+index 60bde99..91a70ac 100644
+--- a/modules/swagger-codegen/src/main/resources/csharp/api_doc.mustache
++++ b/modules/swagger-codegen/src/main/resources/csharp/api_doc.mustache
+@@ -1,7 +1,7 @@
+ # {{packageName}}.{{apiPackage}}.{{classname}}{{#description}}
+ {{description}}{{/description}}
+
+-All URIs are relative to *{{{basePath}}}*
++All URIs are relative to your configured base path, as per example.
+
+ Method | HTTP request | Description
+ ------------- | ------------- | -------------
+@@ -52,6 +52,8 @@ namespace Example
+             {{/authMethods}}
+
+             {{/hasAuthMethods}}
++            Configuration.Default.BasePath = "{{basePath}}";
++
+             var apiInstance = new {{classname}}();
+             {{#allParams}}
+             {{#isPrimitiveType}}
+diff --git a/modules/swagger-codegen/src/main/resources/go/README.mustache b/modules/swagger-codegen/src/main/resources/go/README.mustache
+index 0e89ca6..cccfac3 100644
+--- a/modules/swagger-codegen/src/main/resources/go/README.mustache
++++ b/modules/swagger-codegen/src/main/resources/go/README.mustache
+@@ -90,6 +90,22 @@ Or via OAuth2 module to automaticly refresh tokens and perform user authenticati
+ {{/isOAuth}}
+ {{/authMethods}}
+
++## Notes
++
++Host name will need to be overridden in Configuration object, either via BasePath or Host depending on usage:
++Example
++```
++cfg := &Configuration{
++  BasePath:      "https://{{myHostName}}/api/1.1",
++  DefaultHeader: make(map[string]string),
++  UserAgent:     "Swagger-Codegen/1.0.0/go",
++}
++```
++Or
++```
++cfg.Host = "{{myHostName}}"
++```
++
+ ## Author
+
+ {{#apiInfo}}{{#apis}}{{^hasMore}}{{infoEmail}}
+diff --git a/modules/swagger-codegen/src/main/resources/objc/README.mustache b/modules/swagger-codegen/src/main/resources/objc/README.mustache
+index 59300fd..27b1fb6 100644
+--- a/modules/swagger-codegen/src/main/resources/objc/README.mustache
++++ b/modules/swagger-codegen/src/main/resources/objc/README.mustache
+@@ -80,6 +80,7 @@ Please follow the [installation procedure](#installation--usage) and then run th
+ [apiConfig setAccessToken:@"YOUR_ACCESS_TOKEN"];
+ {{/isOAuth}}{{/authMethods}}
+ {{/hasAuthMethods}}
++[apiConfig setHost:@"{{myHostName}}"];
+
+ {{#allParams}}{{{dataType}}} *{{paramName}} = {{{example}}}; // {{{description}}}{{^required}} (optional){{/required}}{{#defaultValue}} (default to {{{.}}}){{/defaultValue}}
+ {{/allParams}}
+@@ -142,4 +143,3 @@ Class | Method | HTTP request | Description
+
+ {{#apiInfo}}{{#apis}}{{^hasMore}}{{infoEmail}}
+ {{/hasMore}}{{/apis}}{{/apiInfo}}
+-
+diff --git a/modules/swagger-codegen/src/main/resources/python/README.mustache b/modules/swagger-codegen/src/main/resources/python/README.mustache
+index c1355be..8d7c7eb 100644
+--- a/modules/swagger-codegen/src/main/resources/python/README.mustache
++++ b/modules/swagger-codegen/src/main/resources/python/README.mustache
+@@ -67,7 +67,11 @@ from pprint import pprint
+ # Uncomment below to setup prefix (e.g. Bearer) for API key, if needed
+ # {{{packageName}}}.configuration.api_key_prefix['{{{keyParamName}}}'] = 'Bearer'{{/isApiKey}}{{#isOAuth}}
+ # Configure OAuth2 access token for authorization: {{{name}}}
+-{{{packageName}}}.configuration.access_token = 'YOUR_ACCESS_TOKEN'{{/isOAuth}}{{/authMethods}}
++{{{packageName}}}.configuration.access_token = 'YOUR_ACCESS_TOKEN'{{/isOAuth}}
++# Configure host name
++{{{packageName}}}.configuration.host = "{{myHostName}}"
++# Enable or Disable debugging
++{{{packageName}}}.configuration.debugging = True{{/authMethods}}
+ {{/hasAuthMethods}}
+ # create an instance of the API class
+ api_instance = {{{packageName}}}.{{{classname}}}()
+diff --git a/modules/swagger-codegen/src/main/resources/python/api_doc.mustache b/modules/swagger-codegen/src/main/resources/python/api_doc.mustache
+index a496f63..fd63a7b 100644
+--- a/modules/swagger-codegen/src/main/resources/python/api_doc.mustache
++++ b/modules/swagger-codegen/src/main/resources/python/api_doc.mustache
+@@ -36,7 +36,11 @@ configuration.api_key['{{{keyParamName}}}'] = 'YOUR_API_KEY'
+ # configuration.api_key_prefix['{{{keyParamName}}}'] = 'Bearer'{{/isApiKey}}{{#isOAuth}}
+ # Configure OAuth2 access token for authorization: {{{name}}}
+ configuration = {{{packageName}}}.Configuration()
+-configuration.access_token = 'YOUR_ACCESS_TOKEN'{{/isOAuth}}{{/authMethods}}
++configuration.access_token = 'YOUR_ACCESS_TOKEN'{{/isOAuth}}
++# Configure host name
++{{{packageName}}}.configuration.host = "{{myHostName}}"
++# Enable or Disable debugging
++{{{packageName}}}.configuration.debugging = True{{/authMethods}}
+
+ # create an instance of the API class
+ api_instance = {{{packageName}}}.{{{classname}}}({{{packageName}}}.ApiClient(configuration))
+diff --git a/modules/swagger-codegen/src/main/resources/ruby/README.mustache b/modules/swagger-codegen/src/main/resources/ruby/README.mustache
+index abf26ee..282f499 100644
+--- a/modules/swagger-codegen/src/main/resources/ruby/README.mustache
++++ b/modules/swagger-codegen/src/main/resources/ruby/README.mustache
+@@ -73,6 +73,10 @@ require '{{{gemName}}}'
+   #config.api_key_prefix['{{{keyParamName}}}'] = 'Bearer'{{/isApiKey}}{{#isOAuth}}
+   # Configure OAuth2 access token for authorization: {{{name}}}
+   config.access_token = 'YOUR ACCESS TOKEN'{{/isOAuth}}
++  # Configure your host
++  config.host = "{{myHostName}}"
++  # Enable or disable debugging output
++  config.debugging = false
+ {{/authMethods}}end
+ {{/hasAuthMethods}}
+
+diff --git a/modules/swagger-codegen/src/main/resources/ruby/api_doc.mustache b/modules/swagger-codegen/src/main/resources/ruby/api_doc.mustache
+index 02fd5f7..4cae169 100644
+--- a/modules/swagger-codegen/src/main/resources/ruby/api_doc.mustache
++++ b/modules/swagger-codegen/src/main/resources/ruby/api_doc.mustache
+@@ -33,6 +33,10 @@ require '{{{gemName}}}'
+   #config.api_key_prefix['{{{keyParamName}}}'] = 'Bearer'{{/isApiKey}}{{#isOAuth}}
+   # Configure OAuth2 access token for authorization: {{{name}}}
+   config.access_token = 'YOUR ACCESS TOKEN'{{/isOAuth}}
++  # Configure your host
++  config.host = "{{myHostName}}"
++  # Enable or disable debugging output
++  config.debugging = false
+ {{/authMethods}}end
+ {{/hasAuthMethods}}
+
+

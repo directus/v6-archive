@@ -1,0 +1,7 @@
+{
+	"modelPackage": "io.directus.client.model",
+	"invokerPackage": "io.directus.client",
+	"groupId": "io.directus",
+	"artifactId": "directus-sdk",
+	"artifactVersion": "1.1.1"
+}

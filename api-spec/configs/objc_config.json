@@ -1,0 +1,6 @@
+{
+	"coreData": "true",
+	"classPrefix": "DRCTS",
+	"podName": "DircetusClient",
+	"podVersion": "1.1.1"
+}
