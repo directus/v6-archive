@@ -1,0 +1,85 @@
+#!/bin/sh
+set -ea
+
+echo "Running directus!"
+
+DIRECTUS_ADMIN_EMAIL="${DIRECTUS_ADMIN_EMAIL:-admin@admin.com}"
+DIRECTUS_ADMIN_PASSWORD="${DIRECTUS_ADMIN_PASSWORD:-admin}"
+DIRECTUS_SITE_NAME="${DIRECTUS_SITE_NAME:-directus}"
+DIRECTUS_PATH="${DIRECTUS_PATH:-/}"
+
+is_elasticbeanstalk(){
+  if [ -z ${RDS_DB_NAME+x} ]; then
+    return 1
+  else
+    return 0
+  fi
+}
+
+is_linked_container(){
+  if [ -z ${MYSQL_ENV_MYSQL_DATABASE+x} ]; then
+    return 1
+  else
+    return 0
+  fi
+}
+
+is_database_installed(){
+  tables=$(mysql -D $DIRECTUS_DB_SCHEMA -h $DIRECTUS_DB_HOST -u$DIRECTUS_DB_USER -P $DIRECTUS_DB_PORT -p$DIRECTUS_DB_PASSWORD --batch --skip-column-names -e "show tables")
+
+  if [ -z "$tables" ]; then
+    return 1
+  else
+    return 0
+  fi
+}
+
+are_configs_generated(){
+  if [ -s /var/www/html/api/config.php -a -s /var/www/html/api/configuration.php ]; then
+    return 0
+  else
+    return 1
+  fi
+}
+
+if is_elasticbeanstalk ; then
+    DIRECTUS_DB_SCHEMA=$RDS_DB_NAME
+    DIRECTUS_DB_HOST=$RDS_HOSTNAME
+    DIRECTUS_DB_PORT=$RDS_PORT
+    DIRECTUS_DB_PASSWORD=$RDS_PASSWORD
+    DIRECTUS_DB_USER=$RDS_USERNAME
+fi
+
+if is_linked_container ; then
+    DIRECTUS_DB_SCHEMA=$MYSQL_ENV_MYSQL_DATABASE
+    DIRECTUS_DB_HOST=$MYSQL_PORT_3306_TCP_ADDR
+    DIRECTUS_DB_PORT=$MYSQL_PORT_3306_TCP_PORT
+    DIRECTUS_DB_PASSWORD=$MYSQL_ENV_MYSQL_PASSWORD
+    DIRECTUS_DB_USER=$MYSQL_ENV_MYSQL_USER
+fi
+
+
+if [ ! -d /var/www/html/vendor ]; then
+  composer install
+fi
+
+if ! are_configs_generated ; then
+  /var/www/html/bin/directus install:config -h "$DIRECTUS_DB_HOST" -n "$DIRECTUS_DB_SCHEMA" -u "$DIRECTUS_DB_USER" -p "$DIRECTUS_DB_PASSWORD" -d "$DIRECTUS_PATH" -e "$DIRECTUS_ADMIN_EMAIL"
+fi
+
+if ! is_database_installed ; then
+  /var/www/html/bin/directus install:database
+  /var/www/html/bin/directus install:install -e "$DIRECTUS_ADMIN_EMAIL" -p "$DIRECTUS_ADMIN_PASSWORD" -t "$DIRECTUS_SITE_NAME"
+fi
+
+rm -R -f /var/www/html/installation/*
+
+trap 'kill -TERM $PID' TERM INT
+
+apache2-foreground
+
+PID=$!
+wait $PID
+trap - TERM INT
+wait $PID
+EXIT_STATUS=$?

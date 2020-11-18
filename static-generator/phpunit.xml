@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit bootstrap="./phpunit.php">
+  <testsuites>
+        <testsuite name="Directus's test suite">
+            <directory>./tests</directory>
+        </testsuite>
+    </testsuites>
+    <filter>
+        <whitelist>
+            <directory suffix=".php">../../../api/core/</directory>
+            <directory suffix=".php">./api/</directory>
+        </whitelist>
+    </filter>
+</phpunit>

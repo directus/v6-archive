@@ -1,0 +1,10 @@
+Unit tests for this extension require the following to be installed:
+
+"phpunit/phpunit": "5.7.*",
+"mockery/mockery": "^0.9.9"
+
+
+Once installed, tests can be run from the /customs/extensions/static-generator directory:
+
+$ cd /customs/extensions/static-generator
+$ ../../../vendor/bin/phpunit

@@ -1,0 +1,6 @@
+storage/output
+node_modules
+/tests/.DS_Store
+/storage/.DS_Store
+/app/.DS_Store
+.DS_Store

@@ -1,0 +1,307 @@
+<style type="text/css">
+#page-content > div {
+	height: 100%;
+	position: relative;
+}
+
+#static-generator {
+	display: flex;
+	align-items: stretch;
+	height: 100%;
+}
+
+/****************************************/
+#static-generator .sg-editor {
+	flex-grow: 1;
+	display: flex;
+	flex-direction: column;
+	align-items: stretch;
+}
+
+#static-generator .tabs {
+	padding: 10px 20px 0;
+    height: 47px;
+}
+
+#static-generator .editor {
+    border-top: 1px solid #DDDDDD;
+    width: 100%;
+    margin-top: 0;
+    z-index: 1;
+	flex-grow: 1;
+	position: relative;
+}
+
+#static-generator .multipage {
+    transition: all 200ms ease-in-out 0ms;
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    font-size: 28px;
+    color: #DDDDDD;
+    cursor: pointer;
+}
+
+#static-generator .multipage.enabled {
+    color: #666666;
+}
+
+#static-generator .multipage:hover, #static-generator .multipage.active
+    {
+    color: #3498DB;
+}
+
+/****************************************/
+#static-generator input.tab {
+    display: none;
+}
+
+#static-generator label {
+    transition: color 200ms ease-in-out 0ms;
+    position: relative;
+    display: inline-block;
+    padding: 10px 30px 10px 20px;
+    font-weight: 600;
+    text-align: center;
+    color: #999999;
+    border: 1px solid transparent;
+    border-radius: 3px 3px 0 0;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    max-width: 200px;
+    z-index: 2;
+}
+
+#static-generator label:hover {
+    color: #666666;
+    cursor: pointer;
+}
+
+#static-generator label .material-icons {
+    transition: color 200ms ease-in-out 0ms;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 16px;
+    color: #CCCCCC;
+    display: none;
+}
+
+#static-generator .sg-menu .material-icons {
+	transition: all 200ms ease-in-out 0ms;
+    vertical-align: middle;
+    margin-top: -2px;
+    margin-left: 4px;
+    opacity: 0;
+}
+
+#static-generator .sg-menu li:hover>i {
+    opacity: 1;
+}
+
+#static-generator .material-icons.delete-file:hover {
+    color: #E53935;
+}
+
+#static-generator .material-icons.edit-file:hover {
+    color: #3498DB;
+}
+
+#static-generator input.tab:checked+label {
+    color: #666666;
+    border: 1px solid #DDDDDD;
+    border-top: 2px solid #3498DB;
+    border-bottom: 1px solid #FFFFFF;
+    background-color: #FFFFFF;
+}
+
+#static-generator input.tab:checked+label .material-icons {
+    display: block;
+    margin-top: -1px;
+}
+
+#static-generator input.tab:checked+label .material-icons:hover {
+    color: #666666;
+}
+
+i.delete-file, i.edit-file {
+    cursor:pointer;
+    font-size:18px;
+}
+
+#static-generator #tab1:checked ~ #code1, #static-generator #tab2:checked
+    ~ #code2, #static-generator #tab3:checked ~ #code3, #static-generator #tab4:checked
+    ~ #code4, #static-generator #tab5:checked ~ #code5 {
+    /*display: block;*/
+
+}
+
+#static-generator .file-library {
+    margin: 0px 0px 10px 0px;
+    font-weight: 600;
+    font-size: 11px;
+    color: #666666;
+    text-transform: uppercase;
+}
+
+#static-generator .sg-menu {
+	flex-basis: 300px;
+    background-color: #EEEEEE;
+    padding: 20px;
+	display: flex;
+	justify-content: space-between;
+	flex-direction: column;
+}
+
+#static-generator .sg-menu .generation-container {
+    border-top: 1px solid #DDDDDD;
+		padding-top: 20px;
+}
+
+#static-generator .sg-menu .sg-label {
+    font-weight: 600;
+    font-size: 11px;
+    color: #666666;
+    margin-bottom: 6px;
+}
+
+#static-generator .sg-menu select.generation {
+    width: 100%;
+    height: 40px;
+}
+
+#static-generator .sg-menu button {
+    width: 100%;
+    height: 40px;
+    background-color: #3498DB;
+    border-radius: 2px;
+    margin-top: 10px;
+    color: #FFFFFF;
+    font-weight: 600;
+}
+
+#static-generator .sg-menu hr {
+    width: 100%;
+    margin: 40px 0;
+}
+
+#static-generator .sg-menu ul {
+    margin: 0px 0px 0px 20px;
+    list-style: none;
+    line-height: 1.6em;
+    font-family: Arial;
+    color: #BBBBBB;
+}
+
+#static-generator .sg-menu ul li {
+    font-size: 14px;
+    position: relative;
+}
+
+#static-generator .sg-menu ul li a {
+    transition: color 200ms ease-in-out 0ms;
+    color: #666666;
+}
+
+#static-generator .sg-menu ul li a.active, #static-generator .sg-menu ul li a:hover
+    {
+    color: #3498DB;
+}
+
+#static-generator .sg-menu ul li:before {
+    position: absolute;
+    left: -15px;
+    top: 0px;
+    content: '';
+    display: block;
+    border-left: 1px solid #DDDDDD;
+    height: 0.8em;
+    border-bottom: 1px solid #DDDDDD;
+    width: 10px;
+}
+
+#static-generator .sg-menu ul li:after {
+    position: absolute;
+    left: -15px;
+    bottom: -7px;
+    content: '';
+    display: block;
+    border-left: 1px solid #DDDDDD;
+    height: 100%;
+}
+
+#static-generator .sg-menu>ul>li {
+    margin: 0px 0px 0px -30px;
+    font-weight: 500;
+}
+
+#static-generator .sg-menu>ul>li:before {
+    display: none;
+}
+
+#static-generator .sg-menu>ul>li:after {
+    display: none;
+}
+
+#static-generator .sg-menu ul li:last-child:after {
+    display: none;
+}
+.modified span:after {
+	content:"*";
+    color: #3498DB;
+    vertical-align: top;
+    margin-left: 2px;
+  	line-height: 12px;
+ }
+
+#static-generator .sg-menu ul li a.create-new-template,
+#static-generator .create-new-template {
+    margin-top: 10px;
+    margin-left: 30px;
+    color: #3498DB;
+    text-transform: uppercase;
+    font-size: 11px;
+    font-weight: 600;
+    display: block;
+}
+</style>
+
+<div id="static-generator">
+    <div class="sg-editor">
+		<div class="tabs">
+			{{#loadedFiles}}
+			<input id="tab-{{id}}" data-id="{{id}}" class="tab" type="radio" {{#if selected}}checked{{/if}} >
+			<label for="tab-{{id}}" id="label-{{id}}" class="{{#if modified}}modified{{/if}}" ><span data-id="{{id}}" class="tab-link">{{fileName}}</span> <i class="material-icons close-tab" data-id="{{id}}">close</i></label>
+			{{/loadedFiles}}
+		</div>
+
+        {{#loadedFiles}}
+		<div id="editor-{{id}}" data-id="{{id}}" class="{{^selected}}hidden{{/selected}} editor">{{contents}}</div>
+        {{/loadedFiles}}
+    </div>
+    <div class="sg-menu">
+    	<div class="navigation">
+    		<div class="file-library">File Library</div>
+	        {{{directoryStructuresAsUL.directoryTree}}}
+	    </div>
+
+        <div class="generation-container">
+            <div class="sg-label">OUTPUT DIRECTORY<br>(Relative to Directus root)</div>
+            <input type="text" value="{{config.generationOutputDirectory}}" class="hidden"  id="output-dir" name="output-dir" placeholder="eg: ./output" />
+            <input type="text" disabled id="output-dir-text"  value="{{config.generationOutputDirectory}}">
+            <button id="edit-output-dir">EDIT</button><button id="save-output-dir" class="hidden">SAVE</button>
+            <br><br><br>
+            <div class="sg-label">AUTOMATIC CODE GENERATION</div>
+            <select name="generation" id="generation" class="generation">
+                <option value="manually" {{#sgIfCond config.generationMethod 'manually'}}selected{{/sgIfCond}} >Disabled</option>
+                <option value="update" {{#sgIfCond config.generationMethod 'update'}}selected{{/sgIfCond}} >On Content Update</option>
+                <option value="frequency-minute" {{#sgIfCond config.generationMethod 'frequency-minute'}}selected{{/sgIfCond}}>On Frequency - Every Minute</option>
+                <option value="frequency-hour" {{#sgIfCond config.generationMethod 'frequency-hour'}}selected{{/sgIfCond}} >On Frequency - Every Hour</option>
+                <option value="frequency-daily" {{#sgIfCond config.generationMethod 'frequency-daily'}}selected{{/sgIfCond}} >On Frequency - Daily</option>
+                <option value="frequency-weekly" {{#sgIfCond config.generationMethod 'frequency-weekly'}}selected{{/sgIfCond}} >On Frequency - Weekly</option>
+            </select>
+            <button id="generate">GENERATE NOW</button>
+        </div>
+    </div>
+</div>

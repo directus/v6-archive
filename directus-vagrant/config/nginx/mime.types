@@ -1,0 +1,6 @@
+types {
+  application/vnd.ms-fontobject    eot;
+  font/truetype                    ttf;
+  font/opentype                    otf;
+  font/woff                        woff;
+}

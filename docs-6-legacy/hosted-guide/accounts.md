@@ -1,0 +1,2 @@
+### Your Account Dashboard
+From here you can manage your account info, including your email, password, and payment details. From this panel you can also review your account's billing history, see any outstanding balance you might have, and close your account.

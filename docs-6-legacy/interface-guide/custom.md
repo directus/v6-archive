@@ -1,0 +1,3 @@
+# Custom Interfaces
+
+For most content types the Directus Core Interfaces should work well. However if you're looking for a specific interface or have proprietary or custom content types to manage – you may need or want to create something more tailored. Directus Interfaces are modular Javascript files (or dedicated sub-directories for complex interfaces) that allow you to create new ways of interfacing with database content. To learn more about creating your own Interface, checkout this Medium article on the subject: [How to Create a Custom Interface](https://medium.com/directus/how-to-create-a-custom-interface-ba8a4b7e72f4)

@@ -1,0 +1,28 @@
+#!/bin/sh
+set -e
+
+mkdir -p /var/www/html/api/logs
+chown www-data.www-data /var/www/html/api/logs
+chmod -R o-wrx /var/www/html/api/logs
+
+mkdir -p /var/www/html/media
+chown www-data.www-data /var/www/html/media
+
+mkdir -p /var/www/html/storage
+chown -R www-data.www-data /var/www/html/storage
+
+if [ ! -f /var/www/html/api/configuration.php ]; then
+    touch /var/www/html/api/configuration.php
+fi
+
+chown www-data.www-data /var/www/html/api/configuration.php
+chmod o-wrx /var/www/html/api/configuration.php
+
+if [ ! -f /var/www/html/api/config.php ]; then
+    touch /var/www/html/api/config.php
+fi
+
+chown www-data.www-data /var/www/html/api/config.php
+chmod o-wrx /var/www/html/api/config.php
+
+chown www-data.www-data -R /var/www/html/installation

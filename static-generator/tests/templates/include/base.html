@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Static Generator Example</title>
+    </head>
+    <body>
+        <h1>Static Generator Example</h1>
+        <hr>
+        <h2>Directus users displayed in base.html</h2>
+        <ul>
+        {% for user in directus.directus_users %}
+           <li><a href="/users/{{ user.id }}">{{ user.email }}</a></li>
+        {% endfor %}
+        </ul>
+        <div id="content">{% block content %}{% endblock %}</div>
+    </body>
+</html>
