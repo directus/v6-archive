@@ -1,0 +1,81 @@
+# Directus API Summary
+
+Introduction:
+  API Overview: overview/api-overview.md
+  Authentication: overview/authentication.md
+  Endpoints: overview/endpoints.md
+  Filters: overview/filters.md
+  Directus Objects: overview/objects-model.md
+
+Items:
+  Create Item: items/create-item.md
+  Get Items: items/get-items.md
+  Get Item: items/get-item.md
+  Update Item: items/update-item.md
+  Delete Item: items/delete-item.md
+  Batch Create Items: items/batch-create-items.md
+  Batch Update Items: items/batch-update-items.md
+  Batch Delete Items: items/batch-delete-items.md
+
+Files:
+  Create File: files/create-file.md
+  Get Files: files/get-files.md
+  Get File: files/get-file.md
+  Update File: files/update-file.md
+
+Tables:
+  Create Table: tables/create-table.md
+  Get Tables: tables/get-tables.md
+  Get Table: tables/get-table.md
+
+Columns:
+  Create Column: columns/create-column.md
+  Get Columns: columns/get-columns.md
+  Get Column: columns/get-column.md
+  Update Column: columns/update-column.md
+  Delete Column: columns/delete-column.md
+
+Groups:
+  Create Group: groups/create-group.md
+  Get Groups: groups/get-groups.md
+  Get Group: groups/get-group.md
+
+Group Privileges:
+  Create Privileges: privileges/create-privileges.md
+  Get Privileges: privileges/get-privileges.md
+  Get Table Privileges: privileges/get-table-privileges.md
+  Update Privileges: privileges/update-privileges.md
+
+Preferences:
+  Get Preferences: preferences/get-preferences.md
+  Update Preferences: preferences/update-preferences.md
+
+Messages:
+  Get Messages: messages/get-messages.md
+  Get Message: messages/get-message.md
+
+Activity:
+  Get Activity: activity/get-activity.md
+#  Create Activity: activity/create-activity.md
+
+Bookmarks:
+  Get All Bookmarks: bookmarks/get-bookmarks.md
+  Get User Bookmarks: bookmarks/get-user-bookmarks.md
+  Get Bookmark: bookmarks/get-bookmark.md
+  Create Bookmark: bookmarks/create-bookmark.md
+  Delete Bookmark: bookmarks/delete-bookmark.md
+
+Settings:
+  Get Settings: settings/get-settings.md
+  Get Setting By Type: settings/get-type-settings.md
+  Update Settings: settings/update-settings.md
+
+Utils:
+  Random String: utils/get-random-string.md
+  Hash String: utils/get-hash-string.md
+
+PHP SDK:
+  PHP SDK: SDKs/php-sdk.md
+
+JS SDK:
+  JS SDK: SDKs/javascript-sdk.md
